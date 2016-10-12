@@ -14,9 +14,23 @@ namespace Draughts.ConsoleApp
             while (true)
             {
                 Game game = new Game("John", "Jane");
-                Display(game);
-                var squares = game.Board[2, 0].Occupier.GetValidSquares();
+                var piece = game.Board[2, 0].Occupier;
+                IEnumerable<Square> squares = piece.GetValidMoves();
                 Display(game, squares);
+                Console.ReadLine();
+
+                while (true)
+                {
+                    if (squares.Count() == 0) break;
+                    IEnumerable<Piece> piecesTaken = null;
+                    piece.MoveTo(squares.First(), out piecesTaken);
+                    squares = piece.GetValidMoves();
+                    if (squares.Count() == 0) break;
+                    Display(game, squares);
+                    Console.ReadLine();
+                }
+
+                Display(game);
                 Console.ReadLine();
             }
         }

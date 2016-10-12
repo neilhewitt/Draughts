@@ -23,34 +23,27 @@ namespace Draughts.Core
             IsCrowned = true;
         }
 
-        public IEnumerable<Square> GetValidSquares()
+        public IEnumerable<Square> GetValidMoves()
         {
-            List<Square> validSquares = new List<Square>();
-            foreach(Square square in _board.Squares)
-            {
-                if (CanMoveTo(square))
-                {
-                    validSquares.Add(square);
-                }
-            }
-            return validSquares;
+            SequenceMap map = new SequenceMap(_board, Location);
+            return map.Edges.Select(x => x.Square);
         }
 
         public bool MoveTo(Square square, out IEnumerable<Piece> piecesTaken)
         {
-            if (CanMoveTo(square))
+            SequenceMap map = new SequenceMap(_board, Location);
+
+            if (map.Edges.Select(x => x.Square).Contains(square))
             {
-                List<Piece> taken = new List<Piece>();
-                int row = Math.Min(square.RowIndex, Location.RowIndex) + 1;
-                int column = Math.Min(square.ColumnIndex, Location.ColumnIndex) + 1;
-                int endRow = Math.Max(square.RowIndex, Location.RowIndex) - 1;
-                int endColumn = Math.Max(square.ColumnIndex, Location.ColumnIndex) - 1;
-                while (row <= endRow && column <= endColumn)
+                SequenceNode root = map.Root;
+                SequenceNode edge = map.Edges.FirstOrDefault(x => x.Square == square);
+
+                List<Piece> takenList = new List<Piece>();
+                SequenceNode node = edge.Parent;
+                while (node.Parent != null && node.Parent != root)
                 {
-                    taken.Add(_board[row, column].Occupier);
-                    _board[row, column].Clear();
-                    row++;
-                    column++;
+                    takenList.Add(node.Square.Occupier);
+                    node = node.Parent;
                 }
 
                 Location.Clear();
@@ -58,7 +51,7 @@ namespace Draughts.Core
                 _row = square.RowIndex;
                 _column = square.ColumnIndex;
 
-                piecesTaken = taken;
+                piecesTaken = takenList;
                 return true;
             }
 
@@ -66,47 +59,11 @@ namespace Draughts.Core
             return false;
         }
 
+
+
         private bool CanMoveTo(Square square)
         {
-            // black - row must be greater (unless crowned), column must be -1 or +1 for each row
-            // white - row must be less (unless crowned), column must be -1 or +1 for reach row
-            // destination square must be unoccupied
-            // for a multi-row/col jump, all intervening squares must be occupied by the opposite colour's pieces
-
-            if (square == Location) return false;
-
-            int row = Math.Min(square.RowIndex, Location.RowIndex);
-            int column = Math.Min(square.ColumnIndex, Location.ColumnIndex);
-            int endRow = Math.Max(square.RowIndex, Location.RowIndex);
-            int endColumn = Math.Max(square.ColumnIndex, Location.ColumnIndex);
-
-            if (row == endRow || column == endColumn) return false;
-
-            bool canMove = false;
-
-            if (Colour == PieceColour.Black ? square.RowIndex > Location.RowIndex : square.RowIndex < Location.RowIndex
-                || (IsCrowned && square.RowIndex != Location.RowIndex))
-            {
-                int rowDifference = endRow - row;
-                int columnDifference = endColumn - column;
-                if (rowDifference == columnDifference && square.Occupier == null)
-                {
-                    canMove = true;
-                    while (++row < endRow && ++column < endColumn)
-                    {
-                        Piece occupier = _board[row, column].Occupier;
-                        if (occupier == null || (Colour == PieceColour.Black ? occupier.Colour == PieceColour.Black : occupier.Colour == PieceColour.White))
-                        {
-                            canMove = false;
-                            break;
-                        }
-                        row++;
-                        column++;
-                    }
-                }
-            }
-
-            return canMove;
+            return GetValidMoves().Contains(square);
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)
