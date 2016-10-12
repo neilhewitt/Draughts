@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draughts.Core", "Draughts.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draughts.Console", "Draughts.Console\Draughts.Console.csproj", "{3DBDCBBE-4ADB-4782-A1F1-A6A990938EFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draughts.Site", "Draughts.Site\Draughts.Site.csproj", "{43154605-F704-4C3D-8DC8-5D3DF04F82C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3DBDCBBE-4ADB-4782-A1F1-A6A990938EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DBDCBBE-4ADB-4782-A1F1-A6A990938EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DBDCBBE-4ADB-4782-A1F1-A6A990938EFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43154605-F704-4C3D-8DC8-5D3DF04F82C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43154605-F704-4C3D-8DC8-5D3DF04F82C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43154605-F704-4C3D-8DC8-5D3DF04F82C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43154605-F704-4C3D-8DC8-5D3DF04F82C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,31 +11,44 @@ namespace Draughts.ConsoleApp
     {
         static void Main(string[] args)
         {
-            Game game = new Game();
-            Display(game);
-            Console.ReadLine();
+            while (true)
+            {
+                Game game = new Game("John", "Jane");
+                Display(game);
+                var squares = game.Board[2, 0].Occupier.GetValidSquares();
+                Display(game, squares);
+                Console.ReadLine();
+            }
         }
 
-        public static void Display(Game game)
+        public static void Display(Game game, IEnumerable<Square> overlay = null)
         {
             Console.Clear();
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
+            Console.WriteLine(game.BlackPlayer.Name + " plays Black\n");
 
-            string[] state = game.GetState();
-
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
             {
-                Console.Write("\t ─ ─ ─ ─ ─ ─ ─ ─\n\t");
-                string row = state[i];
+                Console.Write("\t\n\t");
                 for (int j = 0; j < 8; j++)
                 {
-                    Console.Write("|" + row[j]);
+                    Square square = game.Board[i, j];
+                    if (square.Colour == SquareColour.White)
+                    {
+                        Console.BackgroundColor = ConsoleColor.White;
+                    }
+                    if (overlay != null && overlay.Contains(square))
+                    {
+                        Console.BackgroundColor = ConsoleColor.Red;
+                    }
+
+                    Console.Write((square.Occupier?.Colour == PieceColour.Black ? "B" : square.Occupier == null ? " " : "W"));
+                    Console.BackgroundColor = ConsoleColor.Black;
                 }
-                Console.WriteLine("|");
             }
-            Console.Write("\t ─ ─ ─ ─ ─ ─ ─ ─\n\n");
+            Console.Write("\t\n\n");
 
             Console.WriteLine("\nSHALL WE PLAY A GAME? (Y/N)");
         }

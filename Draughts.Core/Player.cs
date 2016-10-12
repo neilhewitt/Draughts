@@ -10,10 +10,12 @@ namespace Draughts.Core
     {
         private Game _game;
 
+        public string Name { get; }
         public PieceColour Colour { get; }
 
-        public Player(Game game, PieceColour colour)
+        public Player(string name, Game game, PieceColour colour)
         {
+            Name = name;
             _game = game;
             Colour = colour;
         }

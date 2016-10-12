@@ -9,20 +9,30 @@ namespace Draughts.Core
     public class Board
     {
         private Game _game;
-        private Grid<Piece> _grid;
+        private Grid<Square> _grid;
 
-        internal Grid<Piece> Grid => _grid;
+        public Square this[int row, int column]
+        {
+            get
+            {
+                return _grid[row, column];
+            }
+        }
+
+        public IEnumerable<Square> Squares { get { return Enumerable.Range(0, 8).SelectMany(row => Enumerable.Range(0, 8).Select(column => this[row, column])); } }
 
         public void Initialise()
         {
             _grid.Clear();
             for(int row = 0; row < 8; row++)
             {
-                if (row > 1 && row < 6) row = 6; // skip middle rows
-                for (int col = 0; col < 8; col++)
+                for (int column = 0; column < 8; column++)
                 {
-                    _grid[row, col] = (row < 2 ? new Piece(PieceColour.Black, this, _game.Black) 
-                        : new Piece(PieceColour.White, this, _game.White));
+                    SquareColour colour = (row % 2 == 0 ? (column % 2 == 0 ? SquareColour.Black : SquareColour.White) : (column % 2 == 0 ? SquareColour.White : SquareColour.Black));
+                    Piece piece = ((row < 3 || row > 4) && colour == SquareColour.Black) ?
+                    (row < 3 ? new Piece(PieceColour.Black, this, row, column, _game.BlackPlayer) : new Piece(PieceColour.White, this, row, column, _game.WhitePlayer))
+                    : null;
+                    _grid[row, column] = new Square(colour, piece, row, column);
                 }
             }
         }
@@ -30,7 +40,7 @@ namespace Draughts.Core
         public Board(Game game)
         {
             _game = game;
-            _grid = new Grid<Piece>(8, 8);
+            _grid = new Grid<Square>(8, 8);
         }
     }
 }
