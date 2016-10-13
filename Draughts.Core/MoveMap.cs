@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Draughts.Core
 {
-    public class SequenceMap
+    public class MoveMap
     {
         private SequenceNode _root;
         private Board _board;
@@ -74,6 +74,11 @@ namespace Draughts.Core
             int column = _root.Square.ColumnIndex;
             TestMove(row + rowStep, column + 1, rowStep, _root);
             TestMove(row + rowStep, column - 1, rowStep, _root);
+            if (_root.Square.Occupier.IsCrowned)
+            {
+                TestMove(row - rowStep, column + 1, -rowStep, _root);
+                TestMove(row - rowStep, column - 1, -rowStep, _root);
+            }
 
             List<SequenceNode> edges = new List<SequenceNode>();
             List<SequenceNode> invalidRoots = new List<SequenceNode>();
@@ -89,7 +94,7 @@ namespace Draughts.Core
             }
         }
 
-        public SequenceMap(Board board, Square start)
+        public MoveMap(Board board, Square start)
         {
             if (start.Occupier == null)
             {
@@ -100,54 +105,6 @@ namespace Draughts.Core
             _board = board;
             _colour = start.Occupier.Colour;
             Calculate();
-        }
-    }
-
-    public class SequenceNode
-    {
-        private List<SequenceNode> _children;
-        private SequenceNode _parent;
-
-        public Square Square { get; }
-        public SequenceNode Parent => _parent;
-        public IEnumerable<SequenceNode> Children => _children;
-
-        public SequenceNode Root
-        {
-            get
-            {
-                SequenceNode node = this;
-                while (node.Parent != null) node = node.Parent;
-                return node;
-            }
-        }
-
-
-        internal SequenceNode AddChild(Square square)
-        {
-            SequenceNode node = new SequenceNode(this, square);
-            _children.Add(node);
-            return node;
-        }
-
-        internal void ClearChildren()
-        {
-            _children.Clear();
-        }
-
-        internal void RemoveChild(SequenceNode childNode)
-        {
-            if (_children.Contains(childNode))
-            {
-                _children.Remove(childNode);
-            }
-        }
-
-        public SequenceNode(SequenceNode parent, Square square)
-        {
-            _parent = parent;
-            Square = square;
-            _children = new List<SequenceNode>();
         }
     }
 }

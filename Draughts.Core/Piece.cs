@@ -25,13 +25,13 @@ namespace Draughts.Core
 
         public IEnumerable<Square> GetValidMoves()
         {
-            SequenceMap map = new SequenceMap(_board, Location);
+            MoveMap map = new MoveMap(_board, Location);
             return map.Edges.Select(x => x.Square);
         }
 
         public bool MoveTo(Square square, out IEnumerable<Piece> piecesTaken)
         {
-            SequenceMap map = new SequenceMap(_board, Location);
+            MoveMap map = new MoveMap(_board, Location);
 
             if (map.Edges.Select(x => x.Square).Contains(square))
             {
@@ -43,6 +43,7 @@ namespace Draughts.Core
                 while (node.Parent != null && node.Parent != root)
                 {
                     takenList.Add(node.Square.Occupier);
+                    node.Square.Clear();
                     node = node.Parent;
                 }
 
@@ -57,13 +58,6 @@ namespace Draughts.Core
 
             piecesTaken = new Piece[0];
             return false;
-        }
-
-
-
-        private bool CanMoveTo(Square square)
-        {
-            return GetValidMoves().Contains(square);
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)

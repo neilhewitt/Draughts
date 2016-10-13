@@ -15,6 +15,7 @@ namespace Draughts.ConsoleApp
             {
                 Game game = new Game("John", "Jane");
                 var piece = game.Board[2, 0].Occupier;
+                piece.Crown();
                 IEnumerable<Square> squares = piece.GetValidMoves();
                 Display(game, squares);
                 Console.ReadLine();
