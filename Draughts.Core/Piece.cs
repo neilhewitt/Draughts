@@ -26,12 +26,10 @@ namespace Draughts.Core
                 SequenceNode root = map.Root;
                 SequenceNode edge = map.Edges.FirstOrDefault(x => x.Square == square);
 
-                List<Piece> takenList = new List<Piece>();
-                SequenceNode node = edge.Parent;
-                while (node.Parent != null && node.Parent != root)
+                SequenceNode node = edge;
+                while (node.Parent != null)
                 {
-                    takenList.Add(node.Square.Occupier);
-                    node.Square.Clear();
+                    TakePieceOn(node.Square);
                     node = node.Parent;
                 }
 
@@ -40,9 +38,9 @@ namespace Draughts.Core
                 _row = square.RowIndex;
                 _column = square.ColumnIndex;
 
-                if ((_row == 0 && Colour == PieceColour.Black) || (_row == 7 && Colour == PieceColour.White))
+                if ((_row == 0 && Colour == PieceColour.White) || (_row == 7 && Colour == PieceColour.Black))
                 {
-                    Crown();
+                    TakeCrown();
                 }
 
                 return true;
@@ -51,7 +49,7 @@ namespace Draughts.Core
             return false;
         }
 
-        public void Crown()
+        public void TakeCrown()
         {
             IsCrowned = true;
         }
@@ -59,6 +57,15 @@ namespace Draughts.Core
         public MoveMap GetMoveMap()
         {
             return new MoveMap(_board, _row, _column);
+        }
+
+        private void TakePieceOn(Square square)
+        {
+            if (square.Occupier != null)
+            {
+                square.Clear();
+                Owner.TakePiece();
+            }
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)

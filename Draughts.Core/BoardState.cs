@@ -37,7 +37,7 @@ namespace Draughts.Core
         {
             Location = location;
             Colour = colour;
-            IsCrowned = IsCrowned;
+            IsCrowned = isCrowned;
         }
     }
 }

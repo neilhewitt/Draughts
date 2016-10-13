@@ -9,7 +9,7 @@ namespace Draughts.Core
     public interface IPlayDraughts
     {
         void Initialise(Game game);
-        void PlayerTakesTurn(Player player);
+        bool PlayerTakesTurn(Player player);
         void PlayerWins(Player player);
     }
 
@@ -40,9 +40,34 @@ namespace Draughts.Core
             while (true)
             {
                 _whoseTurnIsItAnyway = BlackPlayer;
-                _gameRunner.PlayerTakesTurn(BlackPlayer);
+
+                if (!_gameRunner.PlayerTakesTurn(BlackPlayer))
+                {
+                    // black can't move, loses game
+                    _gameRunner.PlayerWins(WhitePlayer);
+                    return;
+                }
+
+                if (WhitePlayer.PiecesRemaining == 0)
+                {
+                    _gameRunner.PlayerWins(BlackPlayer);
+                    return;
+                }
+
                 _whoseTurnIsItAnyway = WhitePlayer;
-                _gameRunner.PlayerTakesTurn(WhitePlayer);
+
+                if (!_gameRunner.PlayerTakesTurn(WhitePlayer))
+                {
+                    // black can't move, loses game
+                    _gameRunner.PlayerWins(BlackPlayer);
+                    return;
+                }
+
+                if (BlackPlayer.PiecesRemaining == 0)
+                {
+                    _gameRunner.PlayerWins(WhitePlayer);
+                    return;
+                }
             }
         }
 

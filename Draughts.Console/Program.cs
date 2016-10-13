@@ -16,7 +16,6 @@ namespace Draughts.ConsoleApp
                 GameRunner runner = new GameRunner();
                 Game game = new Game("John", "Jane", new GameRunner());
                 game.StartPlay();
-                Console.ReadLine();
             }
         }
     }

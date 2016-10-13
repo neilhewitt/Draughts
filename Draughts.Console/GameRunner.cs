@@ -4,55 +4,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Draughts.Core;
+using System.Threading;
 
 namespace Draughts.ConsoleApp
 {
     public class GameRunner : IPlayDraughts
     {
         private Game _game;
-        private Move _lastMove;
 
         public void Initialise(Game game)
         {
             _game = game;
-            Display(_game, _game.CurrentPlayer.ValidMoves, null);
+            Display(_game, _game.CurrentPlayer.BestMove);
         }
 
-        public void PlayerTakesTurn(Player player)
+        public bool PlayerTakesTurn(Player player)
         {
-            IEnumerable<Move> moves = player.ValidMoves;
-            Display(_game, moves);
-            Console.WriteLine("Press ENTER to move.");
-            Console.ReadLine();
-            _lastMove = player.ValidMoves.First();
-            player.MovesPiece(_lastMove);
+            Move bestMove = player.BestMove;
+            Display(_game, bestMove);
+            if (bestMove != null) player.Move(bestMove);
+            Thread.Sleep(500);
+            return (bestMove != null);
         }
 
         public void PlayerWins(Player player)
         {
-            throw new NotImplementedException();
+            Display(_game, null);
+            Console.WriteLine("\n" + player.Name + " (" + player.Colour + ") WINS!!!\n\nPress any key to play again.");
+            Console.Read();
         }
 
-        public void Display(Game game, IEnumerable<Move> validMoves, Move lastMove = null)
+        public void Display(Game game, Move bestMove)
         {
             Console.Clear();
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
-            Console.WriteLine(game.BlackPlayer.Name + " plays Black\n");
+            Console.WriteLine(game.CurrentPlayer.Name + " (" + game.CurrentPlayer.Colour.ToString() + ") plays\n");
 
             BoardState state = game.GetState();
-            IEnumerable<PieceLocation> playerState = game.CurrentPlayer == game.BlackPlayer ? state.BlackPieces : state.WhitePieces;
-            PieceLocation firstValidPiece = playerState.FirstOrDefault(x => validMoves.Any(m => m.From.Row == x.Location.Row && m.From.Column == x.Location.Column));
-            if (firstValidPiece != null)
-            {
-                validMoves = validMoves.Where(x => x.From.Row == firstValidPiece.Location.Row && x.From.Column == firstValidPiece.Location.Column);
-            }
-            else
-            {
-                validMoves = null;
-            }
-
             SquareColour current = SquareColour.Black;
             for (int i = 0; i < 8; i++)
             {
@@ -64,24 +54,14 @@ namespace Draughts.ConsoleApp
                         Console.BackgroundColor = ConsoleColor.White;
                     }
 
-                    if (firstValidPiece.Location.Row == i && firstValidPiece.Location.Column == j)
+                    if (bestMove != null && bestMove.From.Row == i && bestMove.From.Column == j)
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.ForegroundColor = ConsoleColor.Green;
                     }
 
-                    if (lastMove != null && lastMove.To.Row == i && lastMove.To.Column == j)
+                    if (bestMove != null && bestMove.To.Row == i && bestMove.To.Column == j)
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                    }
-
-                    if (lastMove != null && lastMove.From.Row == i && lastMove.From.Column == j)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                    }
-
-                    if (validMoves != null && validMoves.Any(x => x.To.Row == i && x.To.Column == j))
-                    {
-                        Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Gray : ConsoleColor.Blue;
+                        Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }
 
                     PieceLocation piece = state.For(i, j);
@@ -91,7 +71,14 @@ namespace Draughts.ConsoleApp
                     }
                     else
                     {
-                        Console.Write((piece.Colour == PieceColour.Black ? "B" : "W"));
+                        if (piece.IsCrowned)
+                        {
+                            Console.Write((piece.Colour == PieceColour.Black ? "b" : "w"));
+                        }
+                        else
+                        {
+                            Console.Write((piece.Colour == PieceColour.Black ? "B" : "W"));
+                        }
                     }
 
                     Console.BackgroundColor = ConsoleColor.Black;
