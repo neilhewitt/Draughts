@@ -22,7 +22,14 @@ namespace Draughts.ConsoleApp
         {
             Move bestMove = player.BestMove;
             Display(_game, bestMove);
-            if (bestMove != null) player.Move(bestMove);
+            if (bestMove != null)
+            {
+                player.Move(bestMove);
+            }
+            else
+            {
+                Console.WriteLine(player.Name + " (" + player.Colour + ") cannot play, and loses the game.\n");
+            }
             Thread.Sleep(500);
             return (bestMove != null);
         }
@@ -88,8 +95,7 @@ namespace Draughts.ConsoleApp
                 current = current == SquareColour.Black ? SquareColour.White : SquareColour.Black;
             }
             Console.Write("\t\n\n");
-
-            Console.WriteLine("\nSHALL WE PLAY A GAME? (Y/N)");
+            Console.WriteLine("Black has " + game.BlackPlayer.PiecesRemaining + " pieces remaining, White has " + game.WhitePlayer.PiecesRemaining + " pieces remaining.");
         }
     }
 }
