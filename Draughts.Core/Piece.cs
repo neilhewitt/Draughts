@@ -14,24 +14,12 @@ namespace Draughts.Core
 
         public PieceColour Colour { get; }
         public bool IsCrowned { get; private set; }
+
         public Player Owner { get; }
 
-        public Square Location => _board[_row, _column];
-
-        public void Crown()
+        public bool MoveTo(Square square)
         {
-            IsCrowned = true;
-        }
-
-        public IEnumerable<Square> GetValidMoves()
-        {
-            MoveMap map = new MoveMap(_board, Location);
-            return map.Edges.Select(x => x.Square);
-        }
-
-        public bool MoveTo(Square square, out IEnumerable<Piece> piecesTaken)
-        {
-            MoveMap map = new MoveMap(_board, Location);
+            MoveMap map = GetMoveMap();
 
             if (map.Edges.Select(x => x.Square).Contains(square))
             {
@@ -47,17 +35,30 @@ namespace Draughts.Core
                     node = node.Parent;
                 }
 
-                Location.Clear();
+                _board[_row, _column].Clear();
                 square.Occupy(this);
                 _row = square.RowIndex;
                 _column = square.ColumnIndex;
 
-                piecesTaken = takenList;
+                if ((_row == 0 && Colour == PieceColour.Black) || (_row == 7 && Colour == PieceColour.White))
+                {
+                    Crown();
+                }
+
                 return true;
             }
 
-            piecesTaken = new Piece[0];
             return false;
+        }
+
+        public void Crown()
+        {
+            IsCrowned = true;
+        }
+
+        public MoveMap GetMoveMap()
+        {
+            return new MoveMap(_board, _row, _column);
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)

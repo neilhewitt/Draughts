@@ -11,6 +11,7 @@ namespace Draughts.Core
         private SequenceNode _root;
         private Board _board;
         private PieceColour _colour;
+        private IEnumerable<SequenceNode> _edges;
 
         public SequenceNode Root => _root;
         
@@ -58,7 +59,7 @@ namespace Draughts.Core
                 node.AddChild(square);
                 return;
             }
-            if (square.Occupier.Colour != _colour)
+            else if (square.Occupier.Colour != _colour)
             {
                 SequenceNode childNode = node.AddChild(square);
                 TestMove(row + rowStep, column + 1, rowStep, childNode);
@@ -81,21 +82,21 @@ namespace Draughts.Core
             }
 
             List<SequenceNode> edges = new List<SequenceNode>();
-            List<SequenceNode> invalidRoots = new List<SequenceNode>();
             FindEdges(_root, edges);
             foreach(SequenceNode edge in edges)
             {
                 if (edge.Square.Occupier != null)
                 {
                     SequenceNode node = edge;
-                    while (node.Parent != _root) node = node.Parent;
+                    while (node.Parent != null && node.Parent != _root) node = node.Parent;
                     _root.RemoveChild(node);
                 }
             }
         }
 
-        public MoveMap(Board board, Square start)
+        public MoveMap(Board board, int row, int column)
         {
+            Square start = board[row, column];
             if (start.Occupier == null)
             {
                 throw new ArgumentException("Starting square must be occupied.");
