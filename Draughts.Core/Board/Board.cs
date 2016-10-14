@@ -29,8 +29,8 @@ namespace Draughts.Core
             {
                 for (int column = 0; column < 8; column++)
                 {
-                    SquareColour colour = (row % 2 == 0 ? (column % 2 == 0 ? SquareColour.Black : SquareColour.White) : (column % 2 == 0 ? SquareColour.White : SquareColour.Black));
-                    Piece piece = ((row < 3 || row > 4) && colour == SquareColour.Black) ?
+                    SquareColour colour = (row % 2 == 0 ? (column % 2 == 0 ? SquareColour.Yellow : SquareColour.White) : (column % 2 == 0 ? SquareColour.White : SquareColour.Yellow));
+                    Piece piece = ((row < 3 || row > 4) && colour == SquareColour.Yellow) ?
                     (row < 3 ? new Piece(PieceColour.Black, this, row, column, _game.BlackPlayer) : new Piece(PieceColour.White, this, row, column, _game.WhitePlayer))
                     : null;
                     _grid[row, column] = new Square(colour, piece, row, column);

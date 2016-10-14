@@ -11,12 +11,11 @@ namespace Draughts.Core
         private static Random _random = new Random(DateTime.Now.Millisecond);
 
         private Game _game;
-        private Move _bestMove;
 
         public string Name { get; }
         public PieceColour Colour { get; }
 
-        public int PiecesRemaining => _game.Board.Squares.Count(s => s.Occupier != null && s.Occupier.Owner == this);
+        public int PiecesRemaining => _game.Board.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == this);
         public int PiecesTaken { get; private set; }
 
         public IEnumerable<Move> ValidMoves
@@ -25,15 +24,15 @@ namespace Draughts.Core
             {
                 List<Move> moves = new List<Move>();
 
-                foreach (Piece piece in _game.Board.Squares.Where(s => s.Occupier != null && s.Occupier.Owner == this).Select(s => s.Occupier))
+                foreach (Piece piece in _game.Board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == this).Select(s => s.Occupier))
                 {
-                    MoveMap map = piece.GetMoveMap();
-                    if (map.Edges.Count() > 0)
+                    MoveTree tree = piece.GetMoveTree();
+                    if (tree.Edges.Count() > 0)
                     {
-                        Dictionary<Move, int> movesByPiecesTaken = new Dictionary<Move, int>(); // moves are unique, count may not be, hence backwards
-                        foreach (SequenceNode edge in map.Edges)
+                        Dictionary<Move, int> movesByPiecesTaken = new Dictionary<Move, int>(); // moves are unique, count may not be, hence swapping key / value
+                        foreach (MoveNode edge in tree.Edges)
                         {
-                            if (edge.Square.Occupier == null)
+                            if (edge.Square.IsEmpty)
                             {
                                 Move move = new Move(edge.Root.Square, edge.Square);
                                 moves.Add(move);
@@ -52,19 +51,19 @@ namespace Draughts.Core
             {
                 Dictionary<Move, int> movesByPiecesTaken = new Dictionary<Move, int>(); // moves are unique, count may not be, hence backwards
 
-                foreach (Piece piece in _game.Board.Squares.Where(s => s.Occupier != null && s.Occupier.Owner == this).Select(s => s.Occupier))
+                foreach (Piece piece in _game.Board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == this).Select(s => s.Occupier))
                 {
-                    MoveMap map = piece.GetMoveMap();
-                    if (map.Edges.Count() > 0)
+                    MoveTree tree = piece.GetMoveTree();
+                    if (tree.Edges.Count() > 0)
                     {
-                        foreach (SequenceNode edge in map.Edges)
+                        foreach (MoveNode edge in tree.Edges)
                         {
-                            if (edge.Square.Occupier == null)
+                            if (edge.Square.IsEmpty)
                             {
                                 Move move = new Move(edge.Root.Square, edge.Square);
                                 int count = 0;
-                                SequenceNode node = edge.Parent;
-                                SequenceNode root = edge.Root;
+                                MoveNode node = edge.Parent;
+                                MoveNode root = edge.Root;
                                 while (node != root)
                                 {
                                     count++;
@@ -93,24 +92,22 @@ namespace Draughts.Core
             }
         }
 
-        public void Move(Move move)
+        internal bool Move(Move move)
         {
-            Move(move.From.Row, move.From.Column, move.To.Row, move.To.Column);
-        }
-
-        public void Move(int fromRow, int fromColumn, int toRow, int toColumn)
-        {
-            if (fromRow < 0 || fromColumn < 0 || fromRow > 7 || fromColumn > 7) throw new ArgumentOutOfRangeException("Row or column was outside board extent.");
-            if (toRow < 0 || toRow < 0 || toRow > 7 || toRow > 7) throw new ArgumentOutOfRangeException("Row or column was outside board extent.");
+            if (move.From.Row < 0 || move.From.Column < 0 || move.From.Row > 7 || move.From.Column > 7) return false;
+            if (move.To.Row < 0 || move.To.Row < 0 || move.To.Row > 7 || move.To.Row > 7) return false;
 
             IEnumerable<Move> moves = ValidMoves;
             
-            if (moves.Any(m => m.From.Row == fromRow && m.From.Column == fromColumn && m.To.Row == toRow && m.To.Column == toColumn))
+            if (moves.Any(m => m.From.Row == move.From.Row && m.From.Column == move.From.Column && m.To.Row == move.To.Row && m.To.Column == move.To.Column))
             {
-                Square origin = _game.Board[fromRow, fromColumn];
-                Square destination = _game.Board[toRow, toColumn];
+                Square origin = _game.Board[move.From.Row, move.From.Column];
+                Square destination = _game.Board[move.To.Row, move.To.Column];
                 origin.Occupier.MoveTo(destination);
+                return true;
             }
+
+            return false;
         }
 
         internal void TakePiece()

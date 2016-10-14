@@ -12,6 +12,8 @@ namespace Draughts.Core
         public Piece Occupier { get; private set; }
         public int RowIndex { get; }
         public int ColumnIndex { get; }
+        public bool IsOccupied => Occupier != null;
+        public bool IsEmpty => !IsOccupied;
 
         internal void Clear()
         {
@@ -34,6 +36,6 @@ namespace Draughts.Core
 
     public enum SquareColour
     {
-        Black, White
+        Yellow, White
     }
 }

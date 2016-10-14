@@ -19,14 +19,14 @@ namespace Draughts.Core
 
         public bool MoveTo(Square square)
         {
-            MoveMap map = GetMoveMap();
+            MoveTree tree = GetMoveTree();
 
-            if (map.Edges.Select(x => x.Square).Contains(square))
+            if (tree.IsValidToMoveTo(square))
             {
-                SequenceNode root = map.Root;
-                SequenceNode edge = map.Edges.FirstOrDefault(x => x.Square == square);
+                MoveNode root = tree.Root;
+                MoveNode edge = tree.EdgeFor(square);
 
-                SequenceNode node = edge;
+                MoveNode node = edge;
                 while (node.Parent != null)
                 {
                     TakePieceOn(node.Square);
@@ -54,14 +54,14 @@ namespace Draughts.Core
             IsCrowned = true;
         }
 
-        public MoveMap GetMoveMap()
+        public MoveTree GetMoveTree()
         {
-            return new MoveMap(_board, _row, _column);
+            return new MoveTree(_board, _row, _column);
         }
 
         private void TakePieceOn(Square square)
         {
-            if (square.Occupier != null)
+            if (square.IsOccupied)
             {
                 square.Clear();
                 Owner.TakePiece();

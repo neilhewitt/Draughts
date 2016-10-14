@@ -18,25 +18,25 @@ namespace Draughts.ConsoleApp
             Display(_game, _game.CurrentPlayer.BestMove);
         }
 
-        public bool PlayerTakesTurn(Player player)
+        public Move PlayerTakesTurn(Player player)
         {
             Move bestMove = player.BestMove;
             Display(_game, bestMove);
             if (bestMove != null)
             {
-                player.Move(bestMove);
+                Thread.Sleep(500);
+                return bestMove;
             }
             else
             {
-                Console.WriteLine(player.Name + " (" + player.Colour + ") cannot play, and loses the game.\n");
+                return null;
             }
-            Thread.Sleep(500);
-            return (bestMove != null);
         }
 
-        public void PlayerWins(Player player)
+        public void PlayerWins(Player player, Player opponent, ReasonsForLosing reason)
         {
             Display(_game, null);
+            if (reason == ReasonsForLosing.CantMove) Console.WriteLine(opponent.Name + " (" + opponent.Colour + ") cannot play, and loses the game.\n");
             Console.WriteLine("\n" + player.Name + " (" + player.Colour + ") WINS!!!\n\nPress any key to play again.");
             Console.Read();
         }
@@ -50,7 +50,7 @@ namespace Draughts.ConsoleApp
             Console.WriteLine(game.CurrentPlayer.Name + " (" + game.CurrentPlayer.Colour.ToString() + ") plays\n");
 
             BoardState state = game.GetState();
-            SquareColour current = SquareColour.Black;
+            SquareColour current = SquareColour.Yellow;
             for (int i = 0; i < 8; i++)
             {
                 Console.Write("\t\n\t");
@@ -59,6 +59,10 @@ namespace Draughts.ConsoleApp
                     if (current == SquareColour.White)
                     {
                         Console.BackgroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkYellow;
                     }
 
                     if (bestMove != null && bestMove.From.Row == i && bestMove.From.Column == j)
@@ -80,19 +84,21 @@ namespace Draughts.ConsoleApp
                     {
                         if (piece.IsCrowned)
                         {
+                            Console.ForegroundColor = piece.Colour == PieceColour.Black ? ConsoleColor.Black : ConsoleColor.White;
                             Console.Write((piece.Colour == PieceColour.Black ? "b" : "w"));
                         }
                         else
                         {
+                            Console.ForegroundColor = piece.Colour == PieceColour.Black ? ConsoleColor.Black : ConsoleColor.White;
                             Console.Write((piece.Colour == PieceColour.Black ? "B" : "W"));
                         }
                     }
 
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.White;
-                    current = current == SquareColour.Black ? SquareColour.White : SquareColour.Black;
+                    current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
                 }
-                current = current == SquareColour.Black ? SquareColour.White : SquareColour.Black;
+                current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
             }
             Console.Write("\t\n\n");
             Console.WriteLine("Black has " + game.BlackPlayer.PiecesRemaining + " pieces remaining, White has " + game.WhitePlayer.PiecesRemaining + " pieces remaining.");

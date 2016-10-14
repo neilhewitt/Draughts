@@ -22,7 +22,7 @@ namespace Draughts.Core
         public BoardState(Board board)
         {
             _pieces = new List<PieceLocation>(
-                board.Squares.Where(s => s.Occupier != null).Select(s => new PieceLocation(new Location(s.RowIndex, s.ColumnIndex), s.Occupier.Colour, s.Occupier.IsCrowned))
+                board.Squares.Where(s => s.IsOccupied).Select(s => new PieceLocation(new Location(s.RowIndex, s.ColumnIndex), s.Occupier.Colour, s.Occupier.IsCrowned))
                 );
         }
     }

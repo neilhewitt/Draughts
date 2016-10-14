@@ -9,8 +9,14 @@ namespace Draughts.Core
     public interface IPlayDraughts
     {
         void Initialise(Game game);
-        bool PlayerTakesTurn(Player player);
-        void PlayerWins(Player player);
+        Move PlayerTakesTurn(Player player);
+        void PlayerWins(Player player, Player opponent, ReasonsForLosing reason);
+    }
+
+    public enum ReasonsForLosing
+    {
+        AllPiecesTaken,
+        CantMove
     }
 
     public class Game
@@ -39,36 +45,33 @@ namespace Draughts.Core
         {
             while (true)
             {
-                _whoseTurnIsItAnyway = BlackPlayer;
-
-                if (!_gameRunner.PlayerTakesTurn(BlackPlayer))
-                {
-                    // black can't move, loses game
-                    _gameRunner.PlayerWins(WhitePlayer);
-                    return;
-                }
-
-                if (WhitePlayer.PiecesRemaining == 0)
-                {
-                    _gameRunner.PlayerWins(BlackPlayer);
-                    return;
-                }
-
-                _whoseTurnIsItAnyway = WhitePlayer;
-
-                if (!_gameRunner.PlayerTakesTurn(WhitePlayer))
-                {
-                    // black can't move, loses game
-                    _gameRunner.PlayerWins(BlackPlayer);
-                    return;
-                }
-
-                if (BlackPlayer.PiecesRemaining == 0)
-                {
-                    _gameRunner.PlayerWins(WhitePlayer);
-                    return;
-                }
+                TakeTurn(BlackPlayer);
+                TakeTurn(WhitePlayer);
             }
+        }
+
+        private void TakeTurn(Player player)
+        {
+            _whoseTurnIsItAnyway = player;
+            Move move = _gameRunner.PlayerTakesTurn(player);
+            if (move == null || !player.Move(move))
+            {
+                // can't move, loses game
+                _gameRunner.PlayerWins(OpponentOf(player), player, ReasonsForLosing.CantMove);
+                return;
+            }
+
+            if (OpponentOf(player).PiecesRemaining == 0)
+            {
+                _gameRunner.PlayerWins(OpponentOf(player), player, ReasonsForLosing.AllPiecesTaken);
+                return;
+            }
+        }
+
+        private Player OpponentOf(Player player)
+        {
+            if (player == BlackPlayer) return WhitePlayer;
+            return BlackPlayer;
         }
 
         public Game(string player1Name, string player2Name, IPlayDraughts gameRunner)
