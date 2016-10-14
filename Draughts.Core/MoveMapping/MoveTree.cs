@@ -76,18 +76,23 @@ namespace Draughts.Core
 
         private void Evaluate()
         {
+            // depending on which player we are evaluating moves for, we need to either move up or down the board
             int rowStep = _root.Square.Occupier.Colour == PieceColour.Black ? 1 : -1;
 
             int row = _root.Square.RowIndex;
             int column = _root.Square.ColumnIndex;
             TestMove(row + rowStep, column + 1, rowStep, _root);
             TestMove(row + rowStep, column - 1, rowStep, _root);
+
+            // a crowned piece ('king') may move in the reverse direction as well
             if (_root.Square.Occupier.IsCrowned)
             {
                 TestMove(row - rowStep, column + 1, -rowStep, _root);
                 TestMove(row - rowStep, column - 1, -rowStep, _root);
             }
 
+            // extract the edges (end squares) of each sequence, and remove those that end in an occupied square on the board's edge,
+            // as those are not valid move targets
             List<MoveNode> edges = new List<MoveNode>();
             FindEdges(_root, edges);
             foreach(MoveNode edge in edges)

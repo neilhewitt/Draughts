@@ -26,18 +26,4 @@ namespace Draughts.Core
                 );
         }
     }
-
-    public class PieceLocation
-    {
-        public Location Location { get; }
-        public PieceColour Colour { get; }
-        public bool IsCrowned { get; }
-
-        public PieceLocation(Location location, PieceColour colour, bool isCrowned)
-        {
-            Location = location;
-            Colour = colour;
-            IsCrowned = isCrowned;
-        }
-    }
 }

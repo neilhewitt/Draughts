@@ -1,0 +1,33 @@
+﻿@model Draughts.Site.Models.PlayerNamesModel
+
+@{
+    ViewBag.Title = "Board";
+}
+
+<h2>Welcome to SuperDraughts!</h2>
+<p>SuperDraughts is the very best version of English Draughts ever written in about three days. Caution: may contains bugs.</p>
+<hr />
+@if (Model != null && String.IsNullOrWhiteSpace(Model.Player1Name))
+{
+    <h3>Please enter the player names</h3>
+    <p>Enter your name/s below. Leave blank if you want the computer to play for that player. Be warned, the computer is fairly dumb!</p>
+    using (Html.BeginForm("PlayerNames", "Game"))
+    {
+        <div class="form-group">
+            <label for="player1name">Player 1 name:</label>
+            @Html.TextBox("Player1Name", "", new { @class = "form-control", id = "player1name" })
+        </div>
+        <div class="form-group">
+            <label for="player2name">Player2 name:</label>
+            @Html.TextBox("Player2Name", "", new { @class = "form-control", id = "player2name" })
+        </div>
+
+        <button type="submit" class="btn btn-lg">Play!</button>
+    }
+}
+else
+{
+    <h4>OK, @Model.Player1Name and @Model.Player2Name, let's get ready to play... SuperDraughts!</h4>
+    <button type="button" class="btn btn-default">Start</button>
+}
+
