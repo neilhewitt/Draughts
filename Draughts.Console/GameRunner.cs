@@ -103,5 +103,10 @@ namespace Draughts.ConsoleApp
             Console.Write("\t\n\n");
             Console.WriteLine("Black has " + game.BlackPlayer.PiecesRemaining + " pieces remaining, White has " + game.WhitePlayer.PiecesRemaining + " pieces remaining.");
         }
+
+        public void ComputerPlayerTakesTurn(Move move)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

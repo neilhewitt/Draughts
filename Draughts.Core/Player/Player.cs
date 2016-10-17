@@ -14,6 +14,7 @@ namespace Draughts.Core
 
         public string Name { get; }
         public PieceColour Colour { get; }
+        public bool IsComputerPlayer { get; }
 
         public int PiecesRemaining => _game.Board.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == this);
         public int PiecesTaken { get; private set; }
@@ -115,11 +116,12 @@ namespace Draughts.Core
             PiecesTaken++;
         }
 
-        public Player(string name, Game game, PieceColour colour)
+        public Player(string name, Game game, PieceColour colour, bool isComputerPlayer)
         {
             Name = name;
             _game = game;
             Colour = colour;
+            IsComputerPlayer = isComputerPlayer;
         }
     }
 }

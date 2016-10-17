@@ -10,6 +10,7 @@ namespace Draughts.Core
     {
         void Initialise(Game game);
         Move PlayerTakesTurn(Player player);
+        void ComputerPlayerTakesTurn(Move move);
         void PlayerWins(Player player, Player opponent, ReasonsForLosing reason);
     }
 }

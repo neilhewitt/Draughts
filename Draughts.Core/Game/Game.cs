@@ -40,7 +40,8 @@ namespace Draughts.Core
         private void TakeTurn(Player player)
         {
             _whoseTurnIsItAnyway = player;
-            Move move = _client.PlayerTakesTurn(player);
+            Move move = player.IsComputerPlayer ? player.BestMove : _client.PlayerTakesTurn(player);
+            
             if (move == null || !player.Move(move))
             {
                 // can't move, loses game
@@ -61,12 +62,13 @@ namespace Draughts.Core
             return BlackPlayer;
         }
 
-        public Game(string player1Name, string player2Name, IPlayDraughts client)
+        public Game(string player1Name, string player2Name, IPlayDraughts client, bool computerPlays1 = false, bool computerPlays2 = false)
         {
             _client = client;
             int coinToss = _random.Next(10);
-            BlackPlayer = new Player(coinToss % 2 == 0 ? player1Name : player2Name, this, PieceColour.Black);
-            WhitePlayer = new Player(coinToss % 2 != 0 ? player1Name : player2Name, this, PieceColour.White);
+
+            BlackPlayer = new Player(coinToss % 2 == 0 ? player1Name : player2Name, this, PieceColour.Black, coinToss % 2 == 0 ? computerPlays1 : computerPlays2);
+            WhitePlayer = new Player(coinToss % 2 != 0 ? player1Name : player2Name, this, PieceColour.White, coinToss % 2 != 0 ? computerPlays1 : computerPlays2);
             Board = new Board(this);
             Board.Initialise();
             _whoseTurnIsItAnyway = BlackPlayer;
