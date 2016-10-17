@@ -49,7 +49,6 @@
     <Compile Include="Board\BoardState.cs" />
     <Compile Include="Board\PieceLocation.cs" />
     <Compile Include="Game\Game.cs" />
-    <Compile Include="Board\Location.cs" />
     <Compile Include="Game\IPlayDraughts.cs" />
     <Compile Include="MoveMapping\Move.cs" />
     <Compile Include="Player\Piece.cs" />

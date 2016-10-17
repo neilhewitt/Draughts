@@ -95,15 +95,15 @@ namespace Draughts.Core
 
         internal bool Move(Move move)
         {
-            if (move.From.Row < 0 || move.From.Column < 0 || move.From.Row > 7 || move.From.Column > 7) return false;
-            if (move.To.Row < 0 || move.To.Row < 0 || move.To.Row > 7 || move.To.Row > 7) return false;
+            if (move.FromRow < 0 || move.FromColumn < 0 || move.FromRow > 7 || move.FromColumn > 7) return false;
+            if (move.ToRow < 0 || move.ToRow < 0 || move.ToRow > 7 || move.ToRow > 7) return false;
 
             IEnumerable<Move> moves = ValidMoves;
             
-            if (moves.Any(m => m.From.Row == move.From.Row && m.From.Column == move.From.Column && m.To.Row == move.To.Row && m.To.Column == move.To.Column))
+            if (moves.Any(m => m.FromRow == move.FromRow && m.FromColumn == move.FromColumn && m.ToRow == move.ToRow && m.ToColumn == move.ToColumn))
             {
-                Square origin = _game.Board[move.From.Row, move.From.Column];
-                Square destination = _game.Board[move.To.Row, move.To.Column];
+                Square origin = _game.Board[move.FromRow, move.FromColumn];
+                Square destination = _game.Board[move.ToRow, move.ToColumn];
                 origin.Occupier.MoveTo(destination);
                 return true;
             }

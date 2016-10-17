@@ -8,13 +8,17 @@ namespace Draughts.Core
 {
     public class Move
     {
-        public Location From { get; }
-        public Location To { get; }
+        public int FromRow { get; }
+        public int FromColumn { get; }
+        public int ToRow { get; }
+        public int ToColumn { get; }
 
         internal Move(Square start, Square end)
         {
-            From = new Location(start.RowIndex, start.ColumnIndex);
-            To = new Location(end.RowIndex, end.ColumnIndex);
+            FromRow = start.RowIndex;
+            FromColumn = start.ColumnIndex;
+            ToRow = end.RowIndex;
+            ToColumn = end.ColumnIndex;
         }
     }
 }

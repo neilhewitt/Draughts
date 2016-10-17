@@ -65,12 +65,12 @@ namespace Draughts.ConsoleApp
                         Console.BackgroundColor = ConsoleColor.DarkYellow;
                     }
 
-                    if (bestMove != null && bestMove.From.Row == i && bestMove.From.Column == j)
+                    if (bestMove != null && bestMove.FromRow == i && bestMove.FromColumn == j)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
 
-                    if (bestMove != null && bestMove.To.Row == i && bestMove.To.Column == j)
+                    if (bestMove != null && bestMove.FromRow == i && bestMove.ToColumn == j)
                     {
                         Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }

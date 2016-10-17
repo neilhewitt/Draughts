@@ -20,7 +20,7 @@ namespace Draughts.Core
             }
         }
 
-        public IEnumerable<Square> Squares { get { return Enumerable.Range(0, 8).SelectMany(row => Enumerable.Range(0, 8).Select(column => this[row, column])); } }
+        public IEnumerable<Square> Squares => _grid.Select(s => s.Contents);
 
         public void Initialise()
         {
