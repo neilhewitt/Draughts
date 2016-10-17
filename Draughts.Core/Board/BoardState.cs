@@ -16,13 +16,13 @@ namespace Draughts.Core
 
         public PieceLocation For(int row, int column)
         {
-            return _pieces.SingleOrDefault(p => p.Location.Row == row && p.Location.Column == column);
+            return _pieces.SingleOrDefault(p => p.Row == row && p.Column == column);
         }
 
         public BoardState(Board board)
         {
             _pieces = new List<PieceLocation>(
-                board.Squares.Where(s => s.IsOccupied).Select(s => new PieceLocation(new Location(s.RowIndex, s.ColumnIndex), s.Occupier.Colour, s.Occupier.IsCrowned))
+                board.Squares.Where(s => s.IsOccupied).Select(s => new PieceLocation(s.RowIndex, s.ColumnIndex, s.Occupier.Colour, s.Occupier.IsCrowned))
                 );
         }
     }

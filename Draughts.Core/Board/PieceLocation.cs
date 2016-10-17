@@ -8,13 +8,15 @@ namespace Draughts.Core
 {
     public class PieceLocation
     {
-        public Location Location { get; }
+        public int Row { get; }
+        public int Column { get; }
         public PieceColour Colour { get; }
         public bool IsCrowned { get; }
 
-        public PieceLocation(Location location, PieceColour colour, bool isCrowned)
+        public PieceLocation(int row, int column, PieceColour colour, bool isCrowned)
         {
-            Location = location;
+            Row = row;
+            Column = column;
             Colour = colour;
             IsCrowned = isCrowned;
         }
