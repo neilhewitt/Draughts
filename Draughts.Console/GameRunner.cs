@@ -86,7 +86,7 @@ namespace Draughts.ConsoleApp
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
 
-                    if ((bestMove != null && (bestMove.Nodes.Any(x => x.Row == i && x.Column == j)) || (allMoves != null && allMoves.Any(m => m.Nodes.Any(x => x.Row == i && x.Column == j)))))
+                    if ((bestMove != null && (bestMove.Steps.Any(x => x.Row == i && x.Column == j)) || (allMoves != null && allMoves.Any(m => m.Steps.Any(x => x.Row == i && x.Column == j)))))
                     {
                         Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }

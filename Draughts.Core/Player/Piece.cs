@@ -19,14 +19,14 @@ namespace Draughts.Core
 
         public void Move(Move move)
         {
-            foreach(MoveNode node in move.Nodes)
+            foreach(MoveStep step in move.Steps)
             {
-                Square square = _board[node.Row, node.Column];
-                if (node == move.Nodes.First())
+                Square square = _board[step.Row, step.Column];
+                if (step == move.Steps.First())
                 {
                     square.Clear();
                 }
-                if (node == move.Nodes.Last())
+                if (step == move.Steps.Last())
                 {
                     square.Occupy(this);
                     _row = square.RowIndex;
@@ -34,33 +34,23 @@ namespace Draughts.Core
                 }
                 else
                 {
-                    TakePieceOn(square);
+                    if (square.IsOccupied)
+                    {
+                        square.Clear();
+                        Owner.TakePiece();
+                    }
                 }
             }
 
             if ((_row == 0 && Colour == PieceColour.White) || (_row == 7 && Colour == PieceColour.Black))
             {
-                TakeCrown();
+                IsCrowned = true;
             }
-        }
-
-        public void TakeCrown()
-        {
-            IsCrowned = true;
         }
 
         public IEnumerable<Move> GetMoves()
         {
             return new MoveTree(_board, _row, _column).Moves;
-        }
-
-        private void TakePieceOn(Square square)
-        {
-            if (square.IsOccupied)
-            {
-                square.Clear();
-                Owner.TakePiece();
-            }
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)

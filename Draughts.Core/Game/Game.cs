@@ -40,9 +40,19 @@ namespace Draughts.Core
         private bool TakeTurn(Player player)
         {
             _whoseTurnIsItAnyway = player;
-            Move move = player.IsComputerPlayer ? player.BestMove : _agent.PlayerTakesTurn(player.ValidMoves, player.BestMove);
+            Move selectedMove = null;
+            Move bestMove = null;
+            IEnumerable<Move> validMoves = player.GetValidMoves(out bestMove);
+            if (!player.IsComputerPlayer)
+            {
+                selectedMove = _agent.PlayerTakesTurn(validMoves, bestMove);
+            }
+            else
+            {
+                selectedMove = bestMove;
+            }
             
-            if (move == null || !player.Move(move))
+            if (bestMove == null || !player.Move(selectedMove))
             {
                 // can't move, loses game
                 _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.CantMove);

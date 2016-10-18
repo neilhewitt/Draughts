@@ -11,58 +11,10 @@ namespace Draughts.Core
         private MoveTreeNode _root;
         private Board _board;
         private PieceColour _colour;
-        public IEnumerable<MoveTreeNode> _edges;
 
         public MoveTreeNode Root => _root;
 
         public IEnumerable<Move> Moves { get; private set; }
-
-        public bool IsValidToMoveTo(Square square)
-        {
-            return _edges.Any(x => x.Square == square);
-        }
-
-        public MoveTreeNode EdgeFor(Square square)
-        {
-            return _edges.SingleOrDefault(e => e.Square == square);
-        }
-
-        private void FindEdges(MoveTreeNode node, IList<MoveTreeNode> output)
-        {
-            if (node.Children.Count() == 0)
-            {
-                output.Add(node);
-            }
-            else
-            {
-                foreach(MoveTreeNode childNode in node.Children)
-                {
-                    FindEdges(childNode, output);
-                }
-            }
-        }
-
-        private void TestMove(int row, int column, int rowStep, MoveTreeNode node)
-        {
-            if (row < 0 || column < 0 || row > 7 || column > 7) return; // stepped out of bounds, sequence ends
-
-            Square square = _board[row, column];
-            if (square.IsEmpty) // sequence ends here
-            {
-                node.AddChild(square);
-                return;
-            }
-            else if (square.Occupier.Colour == _colour) // blocked by piece of own colour, not a valid sequence
-            {
-                return;
-            }
-            else // sequence *may* continue, so recurse down one level in each diagonal direction
-            {
-                MoveTreeNode childNode = node.AddChild(square);
-                TestMove(row + rowStep, column + 1, rowStep, childNode);
-                TestMove(row + rowStep, column - 1, rowStep, childNode);
-            }
-        }
 
         private void Evaluate()
         {
@@ -103,7 +55,43 @@ namespace Draughts.Core
             }
 
             Moves = moves;
-            _edges = edges.Where(e => e.Square.IsEmpty);
+        }
+
+        private void FindEdges(MoveTreeNode node, IList<MoveTreeNode> output)
+        {
+            if (node.Children.Count() == 0)
+            {
+                output.Add(node);
+            }
+            else
+            {
+                foreach (MoveTreeNode childNode in node.Children)
+                {
+                    FindEdges(childNode, output);
+                }
+            }
+        }
+
+        private void TestMove(int row, int column, int rowStep, MoveTreeNode node)
+        {
+            if (row < 0 || column < 0 || row > 7 || column > 7) return; // stepped out of bounds, sequence ends
+
+            Square square = _board[row, column];
+            if (square.IsEmpty) // sequence ends here
+            {
+                node.AddChild(square);
+                return;
+            }
+            else if (square.Occupier.Colour == _colour) // blocked by piece of own colour, not a valid sequence
+            {
+                return;
+            }
+            else // sequence *may* continue, so recurse down one level in each diagonal direction
+            {
+                MoveTreeNode childNode = node.AddChild(square);
+                TestMove(row + rowStep, column + 1, rowStep, childNode);
+                TestMove(row + rowStep, column - 1, rowStep, childNode);
+            }
         }
 
         public MoveTree(Board board, int row, int column)
