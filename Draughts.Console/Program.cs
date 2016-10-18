@@ -13,8 +13,8 @@ namespace Draughts.ConsoleApp
         {
             while (true)
             {
-                GameRunner runner = new GameRunner();
-                Game game = new Game("John", "Jane", new GameRunner());
+                ConsoleGameAgent runner = new ConsoleGameAgent();
+                Game game = new Game("John", "Jane", new ConsoleGameAgent());
                 game.StartPlay();
             }
         }

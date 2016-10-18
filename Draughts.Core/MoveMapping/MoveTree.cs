@@ -90,7 +90,7 @@ namespace Draughts.Core
             List<Move> moves = new List<Move>();
             foreach (MoveTreeNode edge in edges.Where(e => e.Square.IsEmpty))
             {
-                Move move = new Move(edge.Square.IsOccupied ? edge.Square.Occupier.IsCrowned: false);
+                Move move = new Move(edge.Root.Square.Occupier.IsCrowned);
                 MoveTreeNode treeNode = edge;
                 while(true)
                 {

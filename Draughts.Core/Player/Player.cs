@@ -58,8 +58,27 @@ namespace Draughts.Core
                             Move bestMove = bestMoves.Skip(_random.Next(bestMoves.Count() - 1)).First(); // pick a random from the available best moves
                             if (movesByPiecesTaken.Values.Max() == 0) // if none of these moves takes any pieces, we can apply extra rules...
                             {
+                                // try not to move next to a piece that could then take you
+                                List<Move> badMoves = new List<Move>();
+                                foreach (Move move in bestMoves)
+                                {
+                                    int rowStep = (Colour == PieceColour.Black ? 1 : -1);
+                                    Square left = _game.Board[move.End.Row + rowStep, move.End.Column - 1];
+                                    Square right = _game.Board[move.End.Row + rowStep, move.End.Column + 1];
+                                    if ((left!= null && left.IsOccupied && left.Occupier.Owner != this) || (right != null && right.IsOccupied && right.Occupier.Owner != this))
+                                    {
+                                        badMoves.Add(move);
+                                    }
+                                }
+                                if (bestMoves.Any(x => !badMoves.Contains(x)))
+                                {
+                                    // there are moves available that are not bad, so let's use only those
+                                    bestMoves = bestMoves.Where(x => !badMoves.Contains(x));
+                                }
+
                                 // any piece that could become crowned now is the best move - pick any of those
-                                IEnumerable<Move> crownMoves = bestMoves.Where(m => !m.PieceIsCrowned && ((Colour == PieceColour.Black && m.End.Row == 7) || (Colour == PieceColour.White && m.End.Row == 0)));
+                                IEnumerable<Move> crownMoves = bestMoves.Where(m => !m.PieceIsCrowned && 
+                                    ((Colour == PieceColour.Black && m.End.Row == 7) || (Colour == PieceColour.White && m.End.Row == 0)));
                                 if (crownMoves.Count() > 0)
                                 {
                                     bestMove = crownMoves.Skip(_random.Next(crownMoves.Count() - 1)).First();
@@ -70,7 +89,8 @@ namespace Draughts.Core
                                 if (bestMoves.Any(m => m.PieceIsCrowned))
                                 {
                                     IEnumerable<Move> bestMoveSubset = bestMoves.Where(m => m.PieceIsCrowned &&
-                                    (Colour == PieceColour.Black && m.End.Row <= m.Start.Row || Colour == PieceColour.White && m.End.Row >= m.Start.Row));
+                                        ((Colour == PieceColour.Black && m.End.Row <= m.Start.Row && m.End.Row > 3) 
+                                        || (Colour == PieceColour.White && m.End.Row >= m.Start.Row && m.End.Row < 4)));
                                     if (bestMoveSubset.Count() > 0)
                                     {
                                         bestMove = bestMoveSubset.Skip(_random.Next(bestMoveSubset.Count() - 1)).First();

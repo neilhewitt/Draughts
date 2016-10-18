@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Draughts.ConsoleApp
 {
-    public class GameRunner : IPlayDraughts
+    public class ConsoleGameAgent : IPlayDraughts
     {
         private Game _game;
 
@@ -19,15 +19,16 @@ namespace Draughts.ConsoleApp
 
         public Move PlayerTakesTurn(IEnumerable<Move> moves, Move bestMove)
         {
-            Display(_game);
-            Thread.Sleep(250);
+            Display(_game, bestMove, false);
             for (int i = 0; i < 3; i++)
             {
                 Display(_game, null, false);
-                Thread.Sleep(150);
+                //Thread.Sleep(150);
                 Display(_game, bestMove, false);
-                Thread.Sleep(150);
+                //Thread.Sleep(150);
             }
+
+            //Thread.Sleep(1000);
 
             if (bestMove != null)
             {
@@ -44,7 +45,7 @@ namespace Draughts.ConsoleApp
             Display(_game, null);
             if (reason == ReasonsForLosing.CantMove) Console.WriteLine(opponent.Name + " (" + opponent.Colour + ") cannot play, and loses the game.\n");
             Console.WriteLine("\n" + player.Name + " (" + player.Colour + ") WINS!!!\n\nPress any key to play again.");
-            Console.Read();
+            //Console.Read();
         }
 
         public void Display(Game game, Move bestMove = null, bool clearFirst = true, IEnumerable<Move> allMoves = null)
@@ -65,9 +66,10 @@ namespace Draughts.ConsoleApp
 
             PieceState state = game.GetState();
             SquareColour current = SquareColour.Yellow;
+            Console.Write("\t 01234567");
             for (int i = 0; i < 8; i++)
             {
-                Console.Write("\t\n\t");
+                Console.Write("\t\n\t" + i.ToString());
                 for (int j = 0; j < 8; j++)
                 {
                     if (current == SquareColour.White)

@@ -32,12 +32,12 @@ namespace Draughts.Core
         {
             while (true)
             {
-                TakeTurn(BlackPlayer);
-                TakeTurn(WhitePlayer);
+                if (!TakeTurn(BlackPlayer)) break;
+                if (!TakeTurn(WhitePlayer)) break;
             }
         }
 
-        private void TakeTurn(Player player)
+        private bool TakeTurn(Player player)
         {
             _whoseTurnIsItAnyway = player;
             Move move = player.IsComputerPlayer ? player.BestMove : _agent.PlayerTakesTurn(player.ValidMoves, player.BestMove);
@@ -46,14 +46,16 @@ namespace Draughts.Core
             {
                 // can't move, loses game
                 _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.CantMove);
-                return;
+                return false;
             }
 
             if (OpponentOf(player).PiecesRemaining == 0)
             {
                 _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.AllPiecesTaken);
-                return;
+                return false;
             }
+
+            return true;
         }
 
         private Player OpponentOf(Player player)
