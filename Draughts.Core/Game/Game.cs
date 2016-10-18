@@ -9,7 +9,7 @@ namespace Draughts.Core
     public class Game
     {
         private static Random _random = new Random();
-        private IPlayDraughts _client;
+        private IPlayDraughts _agent;
         private Player _whoseTurnIsItAnyway;
 
         public Player BlackPlayer { get; }
@@ -18,9 +18,9 @@ namespace Draughts.Core
 
         internal Board Board { get; }
 
-        public BoardState GetState()
+        public PieceState GetState()
         {
-            return new BoardState(Board);
+            return new PieceState(Board);
         }
 
         public void StartPlay()
@@ -40,18 +40,18 @@ namespace Draughts.Core
         private void TakeTurn(Player player)
         {
             _whoseTurnIsItAnyway = player;
-            Move move = player.IsComputerPlayer ? player.BestMove : _client.PlayerTakesTurn(player.ValidMoves, player.BestMove);
+            Move move = player.IsComputerPlayer ? player.BestMove : _agent.PlayerTakesTurn(player.ValidMoves, player.BestMove);
             
             if (move == null || !player.Move(move))
             {
                 // can't move, loses game
-                _client.PlayerWins(OpponentOf(player), player, ReasonsForLosing.CantMove);
+                _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.CantMove);
                 return;
             }
 
             if (OpponentOf(player).PiecesRemaining == 0)
             {
-                _client.PlayerWins(OpponentOf(player), player, ReasonsForLosing.AllPiecesTaken);
+                _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.AllPiecesTaken);
                 return;
             }
         }
@@ -64,7 +64,7 @@ namespace Draughts.Core
 
         public Game(string player1Name, string player2Name, IPlayDraughts client, bool computerPlays1 = false, bool computerPlays2 = false)
         {
-            _client = client;
+            _agent = client;
             int coinToss = _random.Next(10);
 
             BlackPlayer = new Player(coinToss % 2 == 0 ? player1Name : player2Name, this, PieceColour.Black, coinToss % 2 == 0 ? computerPlays1 : computerPlays2);
@@ -72,7 +72,7 @@ namespace Draughts.Core
             Board = new Board(this);
             Board.Initialise();
             _whoseTurnIsItAnyway = BlackPlayer;
-            _client.Initialise(this);
+            _agent.Initialise(this);
         }
     }
 

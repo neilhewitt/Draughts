@@ -11,21 +11,20 @@ namespace Draughts.Core
         private MoveTreeNode _root;
         private Board _board;
         private PieceColour _colour;
+        public IEnumerable<MoveTreeNode> _edges;
 
         public MoveTreeNode Root => _root;
-
-        public IEnumerable<MoveTreeNode> Edges { get; private set; }
 
         public IEnumerable<Move> Moves { get; private set; }
 
         public bool IsValidToMoveTo(Square square)
         {
-            return Edges.Any(x => x.Square == square);
+            return _edges.Any(x => x.Square == square);
         }
 
         public MoveTreeNode EdgeFor(Square square)
         {
-            return Edges.SingleOrDefault(e => e.Square == square);
+            return _edges.SingleOrDefault(e => e.Square == square);
         }
 
         private void FindEdges(MoveTreeNode node, IList<MoveTreeNode> output)
@@ -89,29 +88,22 @@ namespace Draughts.Core
             FindEdges(_root, edges);
 
             List<Move> moves = new List<Move>();
-            foreach (MoveTreeNode edge in edges)
+            foreach (MoveTreeNode edge in edges.Where(e => e.Square.IsEmpty))
             {
-                if (edge.Square.IsOccupied)
+                Move move = new Move(edge.Square.IsOccupied ? edge.Square.Occupier.IsCrowned: false);
+                MoveTreeNode treeNode = edge;
+                while(true)
                 {
-                    MoveTreeNode node = edge;
-                    while (node.Parent != null && node.Parent != _root) node = node.Parent;
-                    _root.RemoveChild(node);
+                    if (treeNode == null) break;
+
+                    move.AddToStart(treeNode.Square.RowIndex, treeNode.Square.ColumnIndex);
+                    treeNode = treeNode.Parent;
                 }
-                else
-                {
-                    Move move = new Move();
-                    MoveTreeNode treeNode = edge;
-                    while (treeNode.Parent != null)
-                    {
-                        move.AddToEnd(treeNode.Square.RowIndex, treeNode.Square.ColumnIndex);
-                        treeNode = treeNode.Parent;
-                    }
-                    moves.Add(move);
-                }
+                moves.Add(move);
             }
 
             Moves = moves;
-            Edges = edges.Where(e => e.Square.IsEmpty);
+            _edges = edges.Where(e => e.Square.IsEmpty);
         }
 
         public MoveTree(Board board, int row, int column)

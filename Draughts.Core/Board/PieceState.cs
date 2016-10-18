@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Draughts.Core
 {
-    public class BoardState
+    public class PieceState
     {
         private IList<PieceInfo> _pieces;
 
@@ -19,7 +19,7 @@ namespace Draughts.Core
             return _pieces.SingleOrDefault(p => p.Row == row && p.Column == column);
         }
 
-        public BoardState(Board board)
+        public PieceState(Board board)
         {
             _pieces = new List<PieceInfo>(
                 board.Squares.Where(s => s.IsOccupied).Select(s => new PieceInfo(s.RowIndex, s.ColumnIndex, s.Occupier.Colour, s.Occupier.IsCrowned))

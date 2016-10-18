@@ -15,15 +15,22 @@ namespace Draughts.ConsoleApp
         public void Initialise(Game game)
         {
             _game = game;
-            Display(_game, _game.CurrentPlayer.BestMove);
         }
 
         public Move PlayerTakesTurn(IEnumerable<Move> moves, Move bestMove)
         {
-            Display(_game, bestMove);
+            Display(_game);
+            Thread.Sleep(250);
+            for (int i = 0; i < 3; i++)
+            {
+                Display(_game, null, false);
+                Thread.Sleep(150);
+                Display(_game, bestMove, false);
+                Thread.Sleep(150);
+            }
+
             if (bestMove != null)
             {
-                Thread.Sleep(500);
                 return bestMove;
             }
             else
@@ -40,15 +47,23 @@ namespace Draughts.ConsoleApp
             Console.Read();
         }
 
-        public void Display(Game game, Move bestMove)
+        public void Display(Game game, Move bestMove = null, bool clearFirst = true, IEnumerable<Move> allMoves = null)
         {
-            Console.Clear();
+            if (clearFirst)
+            {
+                Console.Clear();
+            }
+            else
+            {
+                Console.SetCursorPosition(0, 0);
+            }
+
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
             Console.WriteLine(game.CurrentPlayer.Name + " (" + game.CurrentPlayer.Colour.ToString() + ") plays\n");
 
-            BoardState state = game.GetState();
+            PieceState state = game.GetState();
             SquareColour current = SquareColour.Yellow;
             for (int i = 0; i < 8; i++)
             {
@@ -69,7 +84,7 @@ namespace Draughts.ConsoleApp
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
 
-                    if (bestMove != null && bestMove.End.Row == i && bestMove.End.Column == j)
+                    if ((bestMove != null && (bestMove.Nodes.Any(x => x.Row == i && x.Column == j)) || (allMoves != null && allMoves.Any(m => m.Nodes.Any(x => x.Row == i && x.Column == j)))))
                     {
                         Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }

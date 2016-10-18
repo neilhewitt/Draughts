@@ -12,7 +12,8 @@ namespace Draughts.Core
 
         public MoveNode Start => _nodes.FirstOrDefault();
         public MoveNode End => _nodes.LastOrDefault();
-        public int PiecesTaken { get; }
+        public int PiecesTaken => _nodes.Count() - 2;
+        public bool PieceIsCrowned { get; }
 
         public IEnumerable<MoveNode> Nodes => _nodes;
 
@@ -29,9 +30,10 @@ namespace Draughts.Core
             _nodes.Insert(0, node);
         }
 
-        public Move()
+        public Move(bool isCrowned)
         {
             _nodes = new List<MoveNode>();
+            PieceIsCrowned = isCrowned;
         }
     }
 

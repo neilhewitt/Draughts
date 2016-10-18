@@ -29,6 +29,8 @@ namespace Draughts.Core
                 if (node == move.Nodes.Last())
                 {
                     square.Occupy(this);
+                    _row = square.RowIndex;
+                    _column = square.ColumnIndex;
                 }
                 else
                 {
@@ -47,9 +49,9 @@ namespace Draughts.Core
             IsCrowned = true;
         }
 
-        public MoveTree GetMoveTree()
+        public IEnumerable<Move> GetMoves()
         {
-            return new MoveTree(_board, _row, _column);
+            return new MoveTree(_board, _row, _column).Moves;
         }
 
         private void TakePieceOn(Square square)

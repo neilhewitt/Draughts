@@ -27,8 +27,7 @@ namespace Draughts.Core
 
                 foreach (Piece piece in _game.Board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == this).Select(s => s.Occupier))
                 {
-                    MoveTree tree = piece.GetMoveTree();
-                    moves.AddRange(tree.Moves);
+                    moves.AddRange(piece.GetMoves());
                 }
                 
                 return moves;
@@ -50,11 +49,38 @@ namespace Draughts.Core
                     IEnumerable<Move> bestMoves = movesByPiecesTaken.Where(x => x.Value == movesByPiecesTaken.Values.Max()).Select(x => x.Key);
                     if (bestMoves.Count() == 1)
                     {
-                        return bestMoves.First();
+                        return bestMoves.First(); // we must always pick the move that takes the most pieces, if one exists
                     }
                     else
                     {
-                        return bestMoves.Skip(_random.Next(bestMoves.Count() - 1)).First();
+                        while (true)
+                        {
+                            Move bestMove = bestMoves.Skip(_random.Next(bestMoves.Count() - 1)).First(); // pick a random from the available best moves
+                            if (movesByPiecesTaken.Values.Max() == 0) // if none of these moves takes any pieces, we can apply extra rules...
+                            {
+                                // any piece that could become crowned now is the best move - pick any of those
+                                IEnumerable<Move> crownMoves = bestMoves.Where(m => !m.PieceIsCrowned && ((Colour == PieceColour.Black && m.End.Row == 7) || (Colour == PieceColour.White && m.End.Row == 0)));
+                                if (crownMoves.Count() > 0)
+                                {
+                                    bestMove = crownMoves.Skip(_random.Next(crownMoves.Count() - 1)).First();
+                                    return bestMove;
+                                }
+
+                                // otherwise, make crowned pieces go backwards preferentially to avoid corner-dwelling situations
+                                if (bestMoves.Any(m => m.PieceIsCrowned))
+                                {
+                                    IEnumerable<Move> bestMoveSubset = bestMoves.Where(m => m.PieceIsCrowned &&
+                                    (Colour == PieceColour.Black && m.End.Row <= m.Start.Row || Colour == PieceColour.White && m.End.Row >= m.Start.Row));
+                                    if (bestMoveSubset.Count() > 0)
+                                    {
+                                        bestMove = bestMoveSubset.Skip(_random.Next(bestMoveSubset.Count() - 1)).First();
+                                        return bestMove;
+                                    }
+                                }
+                            }
+
+                            return bestMove;
+                        }
                     }
                 }
 
