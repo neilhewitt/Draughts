@@ -8,17 +8,52 @@ namespace Draughts.Core
 {
     public class Move
     {
-        public int FromRow { get; }
-        public int FromColumn { get; }
-        public int ToRow { get; }
-        public int ToColumn { get; }
+        private IList<MoveNode> _nodes;
 
-        internal Move(Square start, Square end)
+        public MoveNode Start => _nodes.FirstOrDefault();
+        public MoveNode End => _nodes.LastOrDefault();
+        public int PiecesTaken { get; }
+
+        public IEnumerable<MoveNode> Nodes => _nodes;
+
+        public void AddToEnd(int row, int column)
         {
-            FromRow = start.RowIndex;
-            FromColumn = start.ColumnIndex;
-            ToRow = end.RowIndex;
-            ToColumn = end.ColumnIndex;
+            MoveNode node = new MoveNode(row, column, _nodes.LastOrDefault());
+            _nodes.Add(node);
+        }
+
+        public void AddToStart(int row, int column)
+        {
+            MoveNode node = new MoveNode(row, column, null);
+            node.AddNext(_nodes.FirstOrDefault());
+            _nodes.Insert(0, node);
+        }
+
+        public Move()
+        {
+            _nodes = new List<MoveNode>();
+        }
+    }
+
+    public class MoveNode
+    {
+        public int Row { get; }
+        public int Column { get; }
+
+        public MoveNode Previous { get; }
+        public MoveNode Next { get; private set; }
+        public bool IsEnd => Next == null;
+
+        public void AddNext(MoveNode node)
+        {
+            Next = node;
+        }
+
+        public MoveNode(int row, int column, MoveNode previous = null)
+        {
+            Row = row;
+            Column = column;
+            Previous = previous;
         }
     }
 }

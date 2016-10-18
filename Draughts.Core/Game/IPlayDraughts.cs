@@ -9,7 +9,7 @@ namespace Draughts.Core
     public interface IPlayDraughts
     {
         void Initialise(Game game);
-        Move PlayerTakesTurn(Player player);
+        Move PlayerTakesTurn(IEnumerable<Move> possibleMoves, Move recommendedMove);
         void ComputerPlayerTakesTurn(Move move);
         void PlayerWins(Player player, Player opponent, ReasonsForLosing reason);
     }

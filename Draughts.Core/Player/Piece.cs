@@ -17,36 +17,29 @@ namespace Draughts.Core
 
         public Player Owner { get; }
 
-        public bool MoveTo(Square square)
+        public void Move(Move move)
         {
-            MoveTree tree = GetMoveTree();
-
-            if (tree.IsValidToMoveTo(square))
+            foreach(MoveNode node in move.Nodes)
             {
-                MoveNode root = tree.Root;
-                MoveNode edge = tree.EdgeFor(square);
-
-                MoveNode node = edge;
-                while (node.Parent != null)
+                Square square = _board[node.Row, node.Column];
+                if (node == move.Nodes.First())
                 {
-                    TakePieceOn(node.Square);
-                    node = node.Parent;
+                    square.Clear();
                 }
-
-                _board[_row, _column].Clear();
-                square.Occupy(this);
-                _row = square.RowIndex;
-                _column = square.ColumnIndex;
-
-                if ((_row == 0 && Colour == PieceColour.White) || (_row == 7 && Colour == PieceColour.Black))
+                if (node == move.Nodes.Last())
                 {
-                    TakeCrown();
+                    square.Occupy(this);
                 }
-
-                return true;
+                else
+                {
+                    TakePieceOn(square);
+                }
             }
 
-            return false;
+            if ((_row == 0 && Colour == PieceColour.White) || (_row == 7 && Colour == PieceColour.Black))
+            {
+                TakeCrown();
+            }
         }
 
         public void TakeCrown()

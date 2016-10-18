@@ -28,18 +28,7 @@ namespace Draughts.Core
                 foreach (Piece piece in _game.Board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == this).Select(s => s.Occupier))
                 {
                     MoveTree tree = piece.GetMoveTree();
-                    if (tree.Edges.Count() > 0)
-                    {
-                        Dictionary<Move, int> movesByPiecesTaken = new Dictionary<Move, int>(); // moves are unique, count may not be, hence swapping key / value
-                        foreach (MoveNode edge in tree.Edges)
-                        {
-                            if (edge.Square.IsEmpty)
-                            {
-                                Move move = new Move(edge.Root.Square, edge.Square);
-                                moves.Add(move);
-                            }
-                        }
-                    }
+                    moves.AddRange(tree.Moves);
                 }
                 
                 return moves;
@@ -51,29 +40,9 @@ namespace Draughts.Core
             get
             {
                 Dictionary<Move, int> movesByPiecesTaken = new Dictionary<Move, int>(); // moves are unique, count may not be, hence backwards
-
-                foreach (Piece piece in _game.Board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == this).Select(s => s.Occupier))
+                foreach(Move move in ValidMoves)
                 {
-                    MoveTree tree = piece.GetMoveTree();
-                    if (tree.Edges.Count() > 0)
-                    {
-                        foreach (MoveNode edge in tree.Edges)
-                        {
-                            if (edge.Square.IsEmpty)
-                            {
-                                Move move = new Move(edge.Root.Square, edge.Square);
-                                int count = 0;
-                                MoveNode node = edge.Parent;
-                                MoveNode root = edge.Root;
-                                while (node != root)
-                                {
-                                    count++;
-                                    node = node.Parent;
-                                }
-                                movesByPiecesTaken.Add(move, count);
-                            }
-                        }
-                    }
+                    movesByPiecesTaken.Add(move, move.PiecesTaken);
                 }
 
                 if (movesByPiecesTaken.Count > 0)
@@ -95,16 +64,13 @@ namespace Draughts.Core
 
         internal bool Move(Move move)
         {
-            if (move.FromRow < 0 || move.FromColumn < 0 || move.FromRow > 7 || move.FromColumn > 7) return false;
-            if (move.ToRow < 0 || move.ToRow < 0 || move.ToRow > 7 || move.ToRow > 7) return false;
-
-            IEnumerable<Move> moves = ValidMoves;
+            if (move.Start.Row < 0 || move.Start.Column < 0 || move.Start.Row > 7 || move.Start.Column > 7) return false;
+            if (move.End.Row < 0 || move.End.Row < 0 || move.End.Row > 7 || move.End.Row > 7) return false;
             
-            if (moves.Any(m => m.FromRow == move.FromRow && m.FromColumn == move.FromColumn && m.ToRow == move.ToRow && m.ToColumn == move.ToColumn))
+            if (ValidMoves.Any(m => m.Start.Row == move.Start.Row && m.Start.Column == move.Start.Column && m.End.Row == move.End.Row && m.End.Column == move.End.Column))
             {
-                Square origin = _game.Board[move.FromRow, move.FromColumn];
-                Square destination = _game.Board[move.ToRow, move.ToColumn];
-                origin.Occupier.MoveTo(destination);
+                Square origin = _game.Board[move.Start.Row, move.Start.Column];
+                origin.Occupier.Move(move);
                 return true;
             }
 

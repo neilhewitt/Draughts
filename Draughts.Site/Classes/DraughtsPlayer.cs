@@ -18,7 +18,7 @@ namespace Draughts.Site
             throw new NotImplementedException();
         }
 
-        public Move PlayerTakesTurn(Player player)
+        public Move PlayerTakesTurn(IEnumerable<Move> moves, Move bestMove)
         {
             throw new NotImplementedException();
         }

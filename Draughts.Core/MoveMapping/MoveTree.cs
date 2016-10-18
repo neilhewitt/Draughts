@@ -8,35 +8,27 @@ namespace Draughts.Core
 {
     public class MoveTree
     {
-        private MoveNode _root;
+        private MoveTreeNode _root;
         private Board _board;
         private PieceColour _colour;
 
-        public MoveNode Root => _root;
+        public MoveTreeNode Root => _root;
 
-        public IEnumerable<MoveNode> Nodes => _root.Children;
+        public IEnumerable<MoveTreeNode> Edges { get; private set; }
 
-        public IEnumerable<MoveNode> Edges
-        {
-            get
-            {
-                List<MoveNode> nodes = new List<MoveNode>();
-                FindEdges(_root, nodes);
-                return nodes.Where(node => node != _root);
-            }
-        }
+        public IEnumerable<Move> Moves { get; private set; }
 
         public bool IsValidToMoveTo(Square square)
         {
             return Edges.Any(x => x.Square == square);
         }
 
-        public MoveNode EdgeFor(Square square)
+        public MoveTreeNode EdgeFor(Square square)
         {
-            return Edges.FirstOrDefault(x => x.Square == square);
+            return Edges.SingleOrDefault(e => e.Square == square);
         }
 
-        private void FindEdges(MoveNode node, IList<MoveNode> output)
+        private void FindEdges(MoveTreeNode node, IList<MoveTreeNode> output)
         {
             if (node.Children.Count() == 0)
             {
@@ -44,14 +36,14 @@ namespace Draughts.Core
             }
             else
             {
-                foreach(MoveNode childNode in node.Children)
+                foreach(MoveTreeNode childNode in node.Children)
                 {
                     FindEdges(childNode, output);
                 }
             }
         }
 
-        private void TestMove(int row, int column, int rowStep, MoveNode node)
+        private void TestMove(int row, int column, int rowStep, MoveTreeNode node)
         {
             if (row < 0 || column < 0 || row > 7 || column > 7) return; // stepped out of bounds, sequence ends
 
@@ -67,7 +59,7 @@ namespace Draughts.Core
             }
             else // sequence *may* continue, so recurse down one level in each diagonal direction
             {
-                MoveNode childNode = node.AddChild(square);
+                MoveTreeNode childNode = node.AddChild(square);
                 TestMove(row + rowStep, column + 1, rowStep, childNode);
                 TestMove(row + rowStep, column - 1, rowStep, childNode);
             }
@@ -92,17 +84,34 @@ namespace Draughts.Core
 
             // extract the edges (end squares) of each sequence, and remove those that end in an occupied square on the board's edge,
             // as those are not valid move targets
-            List<MoveNode> edges = new List<MoveNode>();
+            // create a path from each edge which enumerates the squares covered by the move
+            List<MoveTreeNode> edges = new List<MoveTreeNode>();
             FindEdges(_root, edges);
-            foreach(MoveNode edge in edges)
+
+            List<Move> moves = new List<Move>();
+            foreach (MoveTreeNode edge in edges)
             {
                 if (edge.Square.IsOccupied)
                 {
-                    MoveNode node = edge;
+                    MoveTreeNode node = edge;
                     while (node.Parent != null && node.Parent != _root) node = node.Parent;
                     _root.RemoveChild(node);
                 }
+                else
+                {
+                    Move move = new Move();
+                    MoveTreeNode treeNode = edge;
+                    while (treeNode.Parent != null)
+                    {
+                        move.AddToEnd(treeNode.Square.RowIndex, treeNode.Square.ColumnIndex);
+                        treeNode = treeNode.Parent;
+                    }
+                    moves.Add(move);
+                }
             }
+
+            Moves = moves;
+            Edges = edges.Where(e => e.Square.IsEmpty);
         }
 
         public MoveTree(Board board, int row, int column)
@@ -113,7 +122,7 @@ namespace Draughts.Core
                 throw new ArgumentException("Starting square must be occupied.");
             }
 
-            _root = new MoveNode(null, start);
+            _root = new MoveTreeNode(null, start);
             _board = board;
             _colour = start.Occupier.Colour;
             Evaluate();

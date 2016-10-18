@@ -47,7 +47,7 @@
   <ItemGroup>
     <Compile Include="Board\Board.cs" />
     <Compile Include="Board\BoardState.cs" />
-    <Compile Include="Board\PieceLocation.cs" />
+    <Compile Include="Board\PieceInfo.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\IPlayDraughts.cs" />
     <Compile Include="MoveMapping\Move.cs" />
@@ -55,7 +55,7 @@
     <Compile Include="Player\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MoveMapping\MoveTree.cs" />
-    <Compile Include="MoveMapping\MoveNode.cs" />
+    <Compile Include="MoveMapping\MoveTreeNode.cs" />
     <Compile Include="Board\Square.cs" />
   </ItemGroup>
   <ItemGroup>

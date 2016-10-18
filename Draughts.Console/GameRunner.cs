@@ -18,9 +18,8 @@ namespace Draughts.ConsoleApp
             Display(_game, _game.CurrentPlayer.BestMove);
         }
 
-        public Move PlayerTakesTurn(Player player)
+        public Move PlayerTakesTurn(IEnumerable<Move> moves, Move bestMove)
         {
-            Move bestMove = player.BestMove;
             Display(_game, bestMove);
             if (bestMove != null)
             {
@@ -65,17 +64,17 @@ namespace Draughts.ConsoleApp
                         Console.BackgroundColor = ConsoleColor.DarkYellow;
                     }
 
-                    if (bestMove != null && bestMove.FromRow == i && bestMove.FromColumn == j)
+                    if (bestMove != null && bestMove.Start.Row == i && bestMove.Start.Column == j)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
 
-                    if (bestMove != null && bestMove.FromRow == i && bestMove.ToColumn == j)
+                    if (bestMove != null && bestMove.End.Row == i && bestMove.End.Column == j)
                     {
                         Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }
 
-                    PieceLocation piece = state.For(i, j);
+                    PieceInfo piece = state.For(i, j);
                     if (piece == null)
                     {
                         Console.Write(" ");

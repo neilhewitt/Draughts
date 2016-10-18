@@ -40,7 +40,7 @@ namespace Draughts.Core
         private void TakeTurn(Player player)
         {
             _whoseTurnIsItAnyway = player;
-            Move move = player.IsComputerPlayer ? player.BestMove : _client.PlayerTakesTurn(player);
+            Move move = player.IsComputerPlayer ? player.BestMove : _client.PlayerTakesTurn(player.ValidMoves, player.BestMove);
             
             if (move == null || !player.Move(move))
             {

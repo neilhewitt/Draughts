@@ -6,29 +6,29 @@ using System.Threading.Tasks;
 
 namespace Draughts.Core
 {
-    public class MoveNode
+    public class MoveTreeNode
     {
-        private List<MoveNode> _children;
-        private MoveNode _parent;
+        private List<MoveTreeNode> _children;
+        private MoveTreeNode _parent;
 
         public Square Square { get; }
-        public MoveNode Parent => _parent;
-        public IEnumerable<MoveNode> Children => _children;
+        public MoveTreeNode Parent => _parent;
+        public IEnumerable<MoveTreeNode> Children => _children;
 
-        public MoveNode Root
+        public MoveTreeNode Root
         {
             get
             {
-                MoveNode node = this;
+                MoveTreeNode node = this;
                 while (node.Parent != null) node = node.Parent;
                 return node;
             }
         }
 
 
-        internal MoveNode AddChild(Square square)
+        internal MoveTreeNode AddChild(Square square)
         {
-            MoveNode node = new MoveNode(this, square);
+            MoveTreeNode node = new MoveTreeNode(this, square);
             _children.Add(node);
             return node;
         }
@@ -38,7 +38,7 @@ namespace Draughts.Core
             _children.Clear();
         }
 
-        internal void RemoveChild(MoveNode childNode)
+        internal void RemoveChild(MoveTreeNode childNode)
         {
             if (_children.Contains(childNode))
             {
@@ -46,11 +46,11 @@ namespace Draughts.Core
             }
         }
 
-        public MoveNode(MoveNode parent, Square square)
+        public MoveTreeNode(MoveTreeNode parent, Square square)
         {
             _parent = parent;
             Square = square;
-            _children = new List<MoveNode>();
+            _children = new List<MoveTreeNode>();
         }
     }
 }
