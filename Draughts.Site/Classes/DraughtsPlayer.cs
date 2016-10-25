@@ -23,7 +23,7 @@ namespace Draughts.Site
             throw new NotImplementedException();
         }
 
-        public void PlayerWins(Player player, Player opponent, ReasonsForLosing reason)
+        public void PlayerWins(Player player, Player opponent, ReasonsForWinning reason)
         {
             throw new NotImplementedException();
         }

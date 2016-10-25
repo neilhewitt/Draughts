@@ -55,13 +55,13 @@ namespace Draughts.Core
             if (bestMove == null || !player.Move(selectedMove))
             {
                 // can't move, loses game
-                _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.CantMove);
+                _agent.PlayerWins(OpponentOf(player), player, ReasonsForWinning.CantMove);
                 return false;
             }
 
             if (OpponentOf(player).PiecesRemaining == 0)
             {
-                _agent.PlayerWins(OpponentOf(player), player, ReasonsForLosing.AllPiecesTaken);
+                _agent.PlayerWins(OpponentOf(player), player, ReasonsForWinning.AllPiecesTaken);
                 return false;
             }
 
@@ -70,17 +70,16 @@ namespace Draughts.Core
 
         private Player OpponentOf(Player player)
         {
-            if (player == BlackPlayer) return WhitePlayer;
-            return BlackPlayer;
+            return (player == BlackPlayer ? WhitePlayer : BlackPlayer);
         }
 
         public Game(string player1Name, string player2Name, IPlayDraughts client, bool computerPlays1 = false, bool computerPlays2 = false)
         {
             _agent = client;
             int coinToss = _random.Next(10);
-
             BlackPlayer = new Player(coinToss % 2 == 0 ? player1Name : player2Name, this, PieceColour.Black, coinToss % 2 == 0 ? computerPlays1 : computerPlays2);
             WhitePlayer = new Player(coinToss % 2 != 0 ? player1Name : player2Name, this, PieceColour.White, coinToss % 2 != 0 ? computerPlays1 : computerPlays2);
+
             Board = new Board(this);
             Board.Initialise();
             _whoseTurnIsItAnyway = BlackPlayer;
@@ -88,7 +87,7 @@ namespace Draughts.Core
         }
     }
 
-    public enum ReasonsForLosing
+    public enum ReasonsForWinning
     {
         AllPiecesTaken,
         CantMove

@@ -12,8 +12,6 @@ namespace Draughts.Core
         private Board _board;
         private PieceColour _colour;
 
-        public MoveTreeNode Root => _root;
-
         public IEnumerable<Move> Moves { get; private set; }
 
         private void Evaluate()

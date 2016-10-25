@@ -33,19 +33,6 @@ namespace Draughts.Core
             return node;
         }
 
-        internal void ClearChildren()
-        {
-            _children.Clear();
-        }
-
-        internal void RemoveChild(MoveTreeNode childNode)
-        {
-            if (_children.Contains(childNode))
-            {
-                _children.Remove(childNode);
-            }
-        }
-
         public MoveTreeNode(MoveTreeNode parent, Square square)
         {
             _parent = parent;

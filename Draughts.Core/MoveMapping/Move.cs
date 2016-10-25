@@ -17,12 +17,6 @@ namespace Draughts.Core
 
         public IEnumerable<MoveStep> Steps => _steps;
 
-        public void AddToEnd(int row, int column)
-        {
-            MoveStep node = new MoveStep(row, column, _steps.LastOrDefault());
-            _steps.Add(node);
-        }
-
         public void AddToStart(int row, int column)
         {
             MoveStep node = new MoveStep(row, column, null);

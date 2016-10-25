@@ -11,6 +11,6 @@ namespace Draughts.Core
         void Initialise(Game game);
         Move PlayerTakesTurn(IEnumerable<Move> possibleMoves, Move recommendedMove);
         void ComputerPlayerTakesTurn(Move move);
-        void PlayerWins(Player player, Player opponent, ReasonsForLosing reason);
+        void PlayerWins(Player player, Player opponent, ReasonsForWinning reason);
     }
 }

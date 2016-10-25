@@ -23,9 +23,9 @@ namespace Draughts.ConsoleApp
             for (int i = 0; i < 3; i++)
             {
                 Display(_game, null, false);
-                //Thread.Sleep(150);
+                Thread.Sleep(150);
                 Display(_game, bestMove, false);
-                //Thread.Sleep(150);
+                Thread.Sleep(150);
             }
 
             //Thread.Sleep(1000);
@@ -40,10 +40,10 @@ namespace Draughts.ConsoleApp
             }
         }
 
-        public void PlayerWins(Player player, Player opponent, ReasonsForLosing reason)
+        public void PlayerWins(Player player, Player opponent, ReasonsForWinning reason)
         {
             Display(_game, null);
-            if (reason == ReasonsForLosing.CantMove) Console.WriteLine(opponent.Name + " (" + opponent.Colour + ") cannot play, and loses the game.\n");
+            if (reason == ReasonsForWinning.CantMove) Console.WriteLine(opponent.Name + " (" + opponent.Colour + ") cannot play, and loses the game.\n");
             Console.WriteLine("\n" + player.Name + " (" + player.Colour + ") WINS!!!\n\nPress any key to play again.");
             //Console.Read();
         }
