@@ -84,8 +84,8 @@ namespace Draughts.Core
 
         public Game()
         {
-            BlackPlayer = new Player("Computer", this, PieceColour.Black, true, (moves, move) => move);
-            WhitePlayer = new Player("Computer", this, PieceColour.White, true, (moves, move) => move);
+            BlackPlayer = new Player(this, PieceColour.Black);
+            WhitePlayer = new Player(this, PieceColour.White);
 
             Board = new Board(this);
             Board.Initialise();

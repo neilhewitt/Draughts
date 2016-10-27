@@ -133,13 +133,13 @@ namespace Draughts.Core
             return null;
         }
 
-        public Player(string name, Game game, PieceColour colour, bool isComputerPlayer, Func<IEnumerable<Move>, Move, Move> selector)
+        public Player(Game game, PieceColour colour)
         {
-            Name = name;
+            Name = "Computer";
             _game = game;
-            _moveSelector = selector;
             Colour = colour;
-            IsComputerPlayer = isComputerPlayer;
+            IsComputerPlayer = true;
+            _moveSelector = (moves, move) => move;
         }
     }
 }
