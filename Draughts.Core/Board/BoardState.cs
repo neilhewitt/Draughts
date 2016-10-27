@@ -1,4 +1,6 @@
-﻿using System;
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Draughts.Core
 {
-    public class PieceState
+    public class BoardState
     {
         private IList<PieceInfo> _pieces;
 
@@ -19,7 +21,7 @@ namespace Draughts.Core
             return _pieces.SingleOrDefault(p => p.Row == row && p.Column == column);
         }
 
-        public PieceState(Board board)
+        public BoardState(Board board)
         {
             _pieces = new List<PieceInfo>(
                 board.Squares.Where(s => s.IsOccupied).Select(s => new PieceInfo(s.RowIndex, s.ColumnIndex, s.Occupier.Colour, s.Occupier.IsCrowned))

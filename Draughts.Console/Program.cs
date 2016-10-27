@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Draughts.ConsoleApp
@@ -13,9 +14,10 @@ namespace Draughts.ConsoleApp
         {
             while (true)
             {
-                ConsoleGameAgent agent = new ConsoleGameAgent();
-                Game game = new Game("John", "Jane", agent);
-                game.StartPlay();
+                Game game = new Game();
+                TestUI ui = new TestUI(game);
+                game.RegisterToPlay("John", (moves, move) => move);
+                game.Play();
             }
         }
     }

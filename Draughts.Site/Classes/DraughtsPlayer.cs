@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Draughts.Site
 {
-    public class DraughtsPlayer : IPlayDraughts
+    public class DraughtsPlayer
     {
         public void ComputerPlayerTakesTurn(Move move)
         {

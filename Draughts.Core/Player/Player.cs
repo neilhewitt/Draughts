@@ -11,10 +11,14 @@ namespace Draughts.Core
         private static Random _random = new Random(DateTime.Now.Millisecond);
 
         private Game _game;
+        private Func<IEnumerable<Move>, Move, Move> _moveSelector;
 
-        public string Name { get; }
+        public string Name { get; private set; }
         public PieceColour Colour { get; }
-        public bool IsComputerPlayer { get; }
+        public bool IsComputerPlayer { get; private set; }
+        public Player Opponent => Colour == PieceColour.Black ? _game.WhitePlayer : _game.BlackPlayer;
+
+        internal Func<IEnumerable<Move>, Move, Move> MoveSelector => _moveSelector;
 
         public int PiecesRemaining => _game.Board.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == this);
         public int PiecesTaken { get; private set; }
@@ -29,7 +33,7 @@ namespace Draughts.Core
 
             bestMove = GetBestMove(moves);
             {
-                if (bestMove.PiecesTaken > 0)
+                if (bestMove != null && bestMove.PiecesTaken > 0)
                 {
                     // we *have* to take this move
                     return new List<Move>() { bestMove };
@@ -51,6 +55,13 @@ namespace Draughts.Core
         internal void TakePiece()
         {
             PiecesTaken++;
+        }
+
+        internal void BecomeHuman(string name, Func<IEnumerable<Move>, Move, Move> moveSelector)
+        {
+            Name = name;
+            IsComputerPlayer = false;
+            _moveSelector = moveSelector;
         }
 
         private Move GetBestMove(IEnumerable<Move> validMoves)
@@ -122,10 +133,11 @@ namespace Draughts.Core
             return null;
         }
 
-        public Player(string name, Game game, PieceColour colour, bool isComputerPlayer)
+        public Player(string name, Game game, PieceColour colour, bool isComputerPlayer, Func<IEnumerable<Move>, Move, Move> selector)
         {
             Name = name;
             _game = game;
+            _moveSelector = selector;
             Colour = colour;
             IsComputerPlayer = isComputerPlayer;
         }

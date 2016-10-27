@@ -8,47 +8,32 @@ using System.Threading;
 
 namespace Draughts.ConsoleApp
 {
-    public class ConsoleGameAgent : IPlayDraughts
+    public class TestUI
     {
-        private Game _game;
-
-        public void Initialise(Game game)
+        public void PreviewTurn(object sender, BeforeMoveEventArgs args)
         {
-            _game = game;
+            Display(args.BoardState, args.Player, args.BestMove, false);
+            Console.SetCursorPosition(0, 17);
+            Move move = args.BestMove;
+            Console.WriteLine(args.Player.Name + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
+                + move.PiecesTaken + " pieces         ");
+            Thread.Sleep(150);
         }
 
-        public Move PlayerTakesTurn(IEnumerable<Move> moves, Move bestMove)
+        public void PlayerTakesTurn(object sender, MoveEventArgs args)
         {
-            Display(_game, bestMove, false);
-            for (int i = 0; i < 3; i++)
-            {
-                Display(_game, null, false);
-                Thread.Sleep(150);
-                Display(_game, bestMove, false);
-                Thread.Sleep(150);
-            }
-
-            //Thread.Sleep(1000);
-
-            if (bestMove != null)
-            {
-                return bestMove;
-            }
-            else
-            {
-                return null;
-            }
+            Display(args.BoardState, args.Player, args.Move, false);
         }
 
-        public void PlayerWins(Player player, Player opponent, ReasonsForWinning reason)
+        public void GameEnds(object sender, GameEndsEventArgs args)
         {
-            Display(_game, null);
-            if (reason == ReasonsForWinning.CantMove) Console.WriteLine(opponent.Name + " (" + opponent.Colour + ") cannot play, and loses the game.\n");
-            Console.WriteLine("\n" + player.Name + " (" + player.Colour + ") WINS!!!\n\nPress any key to play again.");
+            Display(args.BoardState, args.Winner, null);
+            if (args.ReasonPlayerWon == ReasonsForWinning.CantMove) Console.WriteLine(args.Winner.Opponent.Name + " (" + args.Winner.Opponent.Colour + ") cannot play, and loses the game.\n");
+            //Console.WriteLine("\n" + args.Winner.Name + " (" + args.Winner.Colour + ") WINS!!!\n\nPress any key to play again.");
             //Console.Read();
         }
 
-        public void Display(Game game, Move bestMove = null, bool clearFirst = true, IEnumerable<Move> allMoves = null)
+        public void Display(BoardState state, Player player, Move bestMove = null, bool clearFirst = true, IEnumerable<Move> allMoves = null)
         {
             if (clearFirst)
             {
@@ -62,9 +47,8 @@ namespace Draughts.ConsoleApp
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
-            Console.WriteLine(game.CurrentPlayer.Name + " (" + game.CurrentPlayer.Colour.ToString() + ") plays\n");
+            Console.WriteLine(player.Name + " (" + player.Colour.ToString() + ") plays                     \n");
 
-            PieceState state = game.GetState();
             SquareColour current = SquareColour.Yellow;
             Console.Write("\t 01234567");
             for (int i = 0; i < 8; i++)
@@ -88,7 +72,7 @@ namespace Draughts.ConsoleApp
 
                     if ((bestMove != null && (bestMove.Steps.Any(x => x.Row == i && x.Column == j)) || (allMoves != null && allMoves.Any(m => m.Steps.Any(x => x.Row == i && x.Column == j)))))
                     {
-                        Console.BackgroundColor = game.CurrentPlayer.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
+                        Console.BackgroundColor = player.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }
 
                     PieceInfo piece = state.For(i, j);
@@ -117,12 +101,14 @@ namespace Draughts.ConsoleApp
                 current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
             }
             Console.Write("\t\n\n");
-            Console.WriteLine("Black has " + game.BlackPlayer.PiecesRemaining + " pieces remaining, White has " + game.WhitePlayer.PiecesRemaining + " pieces remaining.");
+            Console.WriteLine("Black has " + state.BlackPieces.Count() + " pieces remaining, White has " + state.WhitePieces.Count() + " pieces remaining.");
         }
 
-        public void ComputerPlayerTakesTurn(Move move)
+        public TestUI(Game game)
         {
-            throw new NotImplementedException();
+            game.BeforePlayerMoves += PreviewTurn;
+            game.PlayerMoves += PlayerTakesTurn;
+            game.GameEnds += GameEnds;
         }
     }
 }

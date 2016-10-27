@@ -17,7 +17,7 @@ namespace Draughts.Core
 
         public Player Owner { get; }
 
-        public void Move(Move move)
+        internal void Move(Move move)
         {
             foreach(MoveStep step in move.Steps)
             {
@@ -48,7 +48,7 @@ namespace Draughts.Core
             }
         }
 
-        public IEnumerable<Move> GetMoves()
+        internal IEnumerable<Move> GetMoves()
         {
             return new MoveTree(_board, _row, _column).Moves;
         }
