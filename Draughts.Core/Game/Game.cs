@@ -9,11 +9,9 @@ namespace Draughts.Core
     public class Game
     {
         private static Random _random = new Random();
-        private Player _whoseTurnIsItAnyway;
 
         public Player BlackPlayer { get; private set; }
         public Player WhitePlayer { get; private set; }
-        public Player CurrentPlayer => _whoseTurnIsItAnyway;
 
         public event EventHandler<BeforeMoveEventArgs> BeforePlayerMoves;
         public event EventHandler<MoveEventArgs> PlayerMoves;
@@ -57,7 +55,6 @@ namespace Draughts.Core
 
         private bool TakeTurn(Player player)
         {
-            _whoseTurnIsItAnyway = player;
             Move selectedMove = null;
             Move bestMove = null;
             IEnumerable<Move> validMoves = player.GetValidMoves(out bestMove);
@@ -65,17 +62,17 @@ namespace Draughts.Core
             selectedMove = player.IsComputerPlayer ? bestMove : player.MoveSelector(validMoves, bestMove);
             if (selectedMove == null)
             {
-                GameEnds(this, new GameEndsEventArgs(player.Opponent, ReasonsForWinning.CantMove, new BoardState(Board)));
+                GameEnds(this, new GameEndsEventArgs(player.Opponent, ReasonsForWinning.CantMove, Board.State));
                 return false;
             }
 
-            BeforePlayerMoves(this, new BeforeMoveEventArgs(player, validMoves, bestMove, new BoardState(Board)));
+            BeforePlayerMoves(this, new BeforeMoveEventArgs(player, validMoves, bestMove, Board.State));
             player.Move(selectedMove);
-            PlayerMoves(this, new MoveEventArgs(player, selectedMove, new BoardState(Board)));
+            PlayerMoves(this, new MoveEventArgs(player, selectedMove, Board.State));
 
             if (player.Opponent.PiecesRemaining == 0)
             {
-                GameEnds(this, new GameEndsEventArgs(player.Opponent, ReasonsForWinning.AllPiecesTaken, new BoardState(Board)));
+                GameEnds(this, new GameEndsEventArgs(player.Opponent, ReasonsForWinning.AllPiecesTaken, Board.State));
                 return false;
             }
 
@@ -89,7 +86,6 @@ namespace Draughts.Core
 
             Board = new Board(this);
             Board.Initialise();
-            _whoseTurnIsItAnyway = BlackPlayer;
 
             this.BeforePlayerMoves += (sender, e) => { };
             this.PlayerMoves += (sender, e) => { };

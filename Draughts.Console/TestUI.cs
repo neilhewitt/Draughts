@@ -16,8 +16,8 @@ namespace Draughts.ConsoleApp
             Console.SetCursorPosition(0, 17);
             Move move = args.BestMove;
             Console.WriteLine(args.Player.Name + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
-                + move.PiecesTaken + " pieces         ");
-            Thread.Sleep(150);
+                + move.PiecesTaken + " pieces           ");
+            Thread.Sleep(300);
         }
 
         public void PlayerTakesTurn(object sender, MoveEventArgs args)

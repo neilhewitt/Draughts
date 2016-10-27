@@ -17,6 +17,7 @@ namespace Draughts.ConsoleApp
                 Game game = new Game();
                 TestUI ui = new TestUI(game);
                 game.RegisterToPlay("John", (moves, move) => move);
+                game.RegisterToPlay("Slartibartfast", (moves, move) => moves.Last());
                 game.Play();
             }
         }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Draughts.Core
 {
-    public class MoveTree
+    public class MoveMap
     {
-        private MoveTreeNode _root;
+        private MoveMapNode _root;
         private Board _board;
         private PieceColour _colour;
 
@@ -34,20 +34,20 @@ namespace Draughts.Core
             // extract the edges (end squares) of each sequence, and remove those that end in an occupied square on the board's edge,
             // as those are not valid move targets
             // create a path from each edge which enumerates the squares covered by the move
-            List<MoveTreeNode> edges = new List<MoveTreeNode>();
+            List<MoveMapNode> edges = new List<MoveMapNode>();
             FindEdges(_root, edges);
 
             List<Move> moves = new List<Move>();
-            foreach (MoveTreeNode edge in edges.Where(e => e.Square.IsEmpty))
+            foreach (MoveMapNode edge in edges.Where(e => e.Square.IsEmpty))
             {
-                Move move = new Move(edge.Root.Square.Occupier.IsCrowned);
-                MoveTreeNode treeNode = edge;
+                Move move = new Move(edge.Root.Square.Occupier);
+                MoveMapNode node = edge;
                 while(true)
                 {
-                    if (treeNode == null) break;
+                    if (node == null) break;
 
-                    move.AddToStart(treeNode.Square.RowIndex, treeNode.Square.ColumnIndex);
-                    treeNode = treeNode.Parent;
+                    move.Add(node.Square.RowIndex, node.Square.ColumnIndex);
+                    node = node.Parent;
                 }
                 moves.Add(move);
             }
@@ -55,7 +55,7 @@ namespace Draughts.Core
             Moves = moves;
         }
 
-        private void FindEdges(MoveTreeNode node, IList<MoveTreeNode> output)
+        private void FindEdges(MoveMapNode node, IList<MoveMapNode> output)
         {
             if (node.Children.Count() == 0)
             {
@@ -63,14 +63,14 @@ namespace Draughts.Core
             }
             else
             {
-                foreach (MoveTreeNode childNode in node.Children)
+                foreach (MoveMapNode childNode in node.Children)
                 {
                     FindEdges(childNode, output);
                 }
             }
         }
 
-        private void TestMove(int row, int column, int rowStep, MoveTreeNode node)
+        private void TestMove(int row, int column, int rowStep, MoveMapNode node)
         {
             if (row < 0 || column < 0 || row > 7 || column > 7) return; // stepped out of bounds, sequence ends
 
@@ -86,13 +86,13 @@ namespace Draughts.Core
             }
             else // sequence *may* continue, so recurse down one level in each diagonal direction
             {
-                MoveTreeNode childNode = node.AddChild(square);
+                MoveMapNode childNode = node.AddChild(square);
                 TestMove(row + rowStep, column + 1, rowStep, childNode);
                 TestMove(row + rowStep, column - 1, rowStep, childNode);
             }
         }
 
-        public MoveTree(Board board, int row, int column)
+        public MoveMap(Board board, int row, int column)
         {
             Square start = board[row, column];
             if (start.IsEmpty)
@@ -100,7 +100,7 @@ namespace Draughts.Core
                 throw new ArgumentException("Starting square must be occupied.");
             }
 
-            _root = new MoveTreeNode(null, start);
+            _root = new MoveMapNode(null, start);
             _board = board;
             _colour = start.Occupier.Colour;
             Evaluate();

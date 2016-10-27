@@ -50,7 +50,7 @@ namespace Draughts.Core
 
         internal IEnumerable<Move> GetMoves()
         {
-            return new MoveTree(_board, _row, _column).Moves;
+            return new MoveMap(_board, _row, _column).Moves;
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)

@@ -17,17 +17,17 @@ namespace Draughts.Core
 
         public IEnumerable<MoveStep> Steps => _steps;
 
-        public void AddToStart(int row, int column)
+        public void Add(int row, int column)
         {
             MoveStep node = new MoveStep(row, column, null);
             node.AddNext(_steps.FirstOrDefault());
             _steps.Insert(0, node);
         }
 
-        internal Move(bool isCrowned)
+        internal Move(Piece piece)
         {
             _steps = new List<MoveStep>();
-            PieceIsCrowned = isCrowned;
+            PieceIsCrowned = piece.IsCrowned;
         }
     }
 }

@@ -12,6 +12,8 @@ namespace Draughts.Core
         private Game _game;
         private Grid<Square> _grid;
 
+        public BoardState State => new BoardState(this);
+
         public Square this[int row, int column]
         {
             get
