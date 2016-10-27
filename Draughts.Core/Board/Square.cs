@@ -10,8 +10,8 @@ namespace Draughts.Core
     {
         public SquareColour Colour { get; }
         public Piece Occupier { get; private set; }
-        public int RowIndex { get; }
-        public int ColumnIndex { get; }
+        public int Row { get; }
+        public int Column { get; }
         public bool IsOccupied => Occupier != null;
         public bool IsEmpty => !IsOccupied;
 
@@ -25,12 +25,12 @@ namespace Draughts.Core
             Occupier = occupier;
         }
 
-        public Square(SquareColour colour, Piece occupier, int rowIndex, int columnIndex)
+        public Square(SquareColour colour, Piece occupier, int row, int column)
         {
             Colour = colour;
             Occupier = occupier;
-            RowIndex = rowIndex;
-            ColumnIndex = columnIndex;
+            Row = row;
+            Column = column;
         }
     }
 

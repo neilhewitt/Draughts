@@ -24,7 +24,7 @@ namespace Draughts.Core
         public BoardState(Board board)
         {
             _pieces = new List<PieceInfo>(
-                board.Squares.Where(s => s.IsOccupied).Select(s => new PieceInfo(s.RowIndex, s.ColumnIndex, s.Occupier.Colour, s.Occupier.IsCrowned))
+                board.Squares.Where(s => s.IsOccupied).Select(s => new PieceInfo(s.Row, s.Column, s.Occupier.Colour, s.Occupier.IsCrowned))
                 );
         }
     }

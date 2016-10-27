@@ -19,8 +19,8 @@ namespace Draughts.Core
             // depending on which player we are evaluating moves for, we need to either move up or down the board
             int rowStep = _root.Square.Occupier.Colour == PieceColour.Black ? 1 : -1;
 
-            int row = _root.Square.RowIndex;
-            int column = _root.Square.ColumnIndex;
+            int row = _root.Square.Row;
+            int column = _root.Square.Column;
             TestMove(row + rowStep, column + 1, rowStep, _root);
             TestMove(row + rowStep, column - 1, rowStep, _root);
 
@@ -46,7 +46,7 @@ namespace Draughts.Core
                 {
                     if (node == null) break;
 
-                    move.Add(node.Square.RowIndex, node.Square.ColumnIndex);
+                    move.Add(node.Square.Row, node.Square.Column);
                     node = node.Parent;
                 }
                 moves.Add(move);

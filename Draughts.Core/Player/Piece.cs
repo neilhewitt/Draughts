@@ -29,8 +29,8 @@ namespace Draughts.Core
                 if (step == move.Steps.Last())
                 {
                     square.Occupy(this);
-                    _row = square.RowIndex;
-                    _column = square.ColumnIndex;
+                    _row = square.Row;
+                    _column = square.Column;
                 }
                 else
                 {
