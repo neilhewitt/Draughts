@@ -48,10 +48,11 @@
     <Compile Include="Board\Board.cs" />
     <Compile Include="Board\BoardState.cs" />
     <Compile Include="Board\PieceInfo.cs" />
-    <Compile Include="Game\BeforeMoveEventArgs.cs" />
+    <Compile Include="Board\SquareInfo.cs" />
+    <Compile Include="Game\EventArgs\BeforeMoveEventArgs.cs" />
     <Compile Include="Game\Game.cs" />
-    <Compile Include="Game\GameEndsEventArgs.cs" />
-    <Compile Include="Game\MoveEventArgs.cs" />
+    <Compile Include="Game\EventArgs\GameEndsEventArgs.cs" />
+    <Compile Include="Game\EventArgs\MoveEventArgs.cs" />
     <Compile Include="Moves\Move.cs" />
     <Compile Include="Player\Piece.cs" />
     <Compile Include="Player\Player.cs" />

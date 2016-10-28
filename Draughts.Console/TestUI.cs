@@ -75,7 +75,7 @@ namespace Draughts.ConsoleApp
                         Console.BackgroundColor = player.Colour == PieceColour.Black ? ConsoleColor.Red : ConsoleColor.Blue;
                     }
 
-                    PieceInfo piece = state.For(i, j);
+                    PieceInfo piece = state.For(i, j).PieceInfo;
                     if (piece == null)
                     {
                         Console.Write(" ");
@@ -101,7 +101,7 @@ namespace Draughts.ConsoleApp
                 current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
             }
             Console.Write("\t\n\n");
-            Console.WriteLine("Black has " + state.BlackPieces.Count() + " pieces remaining, White has " + state.WhitePieces.Count() + " pieces remaining.");
+            Console.WriteLine("Black has " + state.BlackPiecesRemaining + " pieces remaining, White has " + state.WhitePiecesRemaining + " pieces remaining.");
         }
 
         public TestUI(Game game)

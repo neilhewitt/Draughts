@@ -26,10 +26,7 @@ namespace Draughts.Core
 
         public bool RegisterToPlay(string name, Func<IEnumerable<Move>, Move, Move> moveSelector)
         {
-            if (!BlackPlayer.IsComputerPlayer && !WhitePlayer.IsComputerPlayer)
-            {
-                return false;
-            }
+            if (!BlackPlayer.IsComputerPlayer && !WhitePlayer.IsComputerPlayer) return false;
 
             if (BlackPlayer.IsComputerPlayer && WhitePlayer.IsComputerPlayer)
             {
