@@ -11,27 +11,23 @@ namespace Draughts.Core
         private static Random _random = new Random(DateTime.Now.Millisecond);
 
         private Game _game;
-        private Func<IEnumerable<Move>, Move, Move> _moveSelector;
+        private Func<IEnumerable<Move>, Move, Move> _selectMoveCallback;
 
         public string Name { get; private set; }
         public PieceColour Colour { get; }
         public bool IsComputerPlayer { get; private set; }
         public Player Opponent => Colour == PieceColour.Black ? _game.WhitePlayer : _game.BlackPlayer;
 
-        internal Func<IEnumerable<Move>, Move, Move> MoveSelector => _moveSelector;
+        internal Func<IEnumerable<Move>, Move, Move> SelectMoveCallback => _selectMoveCallback;
 
         public int PiecesRemaining => _game.Board.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == this);
-        public int PiecesTaken { get; private set; }
+        public int PiecesCaptured { get; private set; }
 
-        internal IEnumerable<Move> GetValidMoves(out Move bestMove)
+        internal IEnumerable<Move> GetValidMoves(out Move bestMove, bool useRandomBestMove = false)
         {
-            List<Move> moves = new List<Move>();
-            foreach (Piece piece in _game.Board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == this).Select(s => s.Occupier))
-            {
-                moves.AddRange(piece.GetMoves());
-            }
-
-            bestMove = GetBestMove(moves);
+            IEnumerable<Move> validMoves = Core.Move.ValidMovesFor(_game.Board, this);
+            // we can use either random best move (pick any from valid moves) or MiniMax (AI play-ahead up to n generations)
+            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, 4);
             {
                 if (bestMove != null && bestMove.PiecesTaken > 0)
                 {
@@ -40,97 +36,99 @@ namespace Draughts.Core
                 }
                 else
                 {
-                    return moves;
+                    return validMoves;
                 }
             }
         }
 
-        internal bool Move(Move move)
+        internal void Move(Move move)
         {
             Square origin = _game.Board[move.Start.Row, move.Start.Column];
             origin.Occupier.Move(move);
-            return true;
         }
 
-        internal void TakePiece()
+        internal void CapturedAPiece()
         {
-            PiecesTaken++;
+            PiecesCaptured++;
         }
 
-        internal void BecomeHuman(string name, Func<IEnumerable<Move>, Move, Move> moveSelector)
+        internal void BecomeHuman(string name, Func<IEnumerable<Move>, Move, Move> selectMoveCallback)
         {
             Name = name;
             IsComputerPlayer = false;
-            _moveSelector = moveSelector;
+            _selectMoveCallback = selectMoveCallback;
         }
 
-        private Move GetBestMove(IEnumerable<Move> validMoves)
+        private Move MiniMaxBestMove(IEnumerable<Move> validMoves, int maxMovesAhead)
         {
-            Dictionary<Move, int> movesByPiecesTaken = new Dictionary<Move, int>(); // moves are unique, count may not be, hence backwards
-            foreach (Move move in validMoves)
+            // minmax algorithm plays n moves ahead and notes which move at the first level leads to the least opponent pieces remaining and the most player pieces remaining
+            // which it recommends as the best move
+            Board newBoard = _game.Board.Clone();
+            MiniMaxResult result = MiniMax(newBoard, this, 0, maxMovesAhead, null, validMoves);
+
+            // if best move takes no pieces but valid moves do take pieces, we have to pick one (any one) that takes pieces
+            if (result.Move != null && result.Move.PiecesTaken == 0 && validMoves.Any(m => m.PiecesTaken > 0)) return RandomBestMove(validMoves);
+            // sometimes there is no best move within n moves ahead, so just use a random of the valid moves available
+            if (result.Move == null) return RandomBestMove(validMoves);
+            // otherwise, return the recommended best move
+            return result.Move;
+        }
+
+        private MiniMaxResult MiniMax(Board board, Player player, int generation, int maxGenerations, MiniMaxResult current, IEnumerable<Move> validMoves = null)
+        {
+            if (current == null) current = new MiniMaxResult() { Move = null, MaxPlayerPiecesRemaining = 0, MaxOpponentPiecesRemaining = 12 };
+            if (generation >= maxGenerations || current.MaxOpponentPiecesRemaining == 0) // we've reached the limit, or a winning move has been found already
+                return current;
+            generation++;
+            
+            validMoves = validMoves ?? Core.Move.ValidMovesFor(board, player);
+            foreach(Move move in Randomize(validMoves)) // randomize the move order to avoid first-place bias for sets of equally good moves
             {
-                movesByPiecesTaken.Add(move, move.PiecesTaken);
+                Board newBoard = board.Clone();
+                newBoard[move.Start.Row, move.Start.Column].Occupier.Move(move);
+
+                int playerCount = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player);
+                int opponentCount = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player.Opponent);
+                if (opponentCount < current.MaxOpponentPiecesRemaining || playerCount > current.MaxPlayerPiecesRemaining)
+                {
+                    if (generation == 1) current.Move = move; // only 1st generation moves are actually valid, others are projections
+                    current.MaxPlayerPiecesRemaining = playerCount;
+                    current.MaxOpponentPiecesRemaining = opponentCount;
+                }
+
+                if (current.Move == null) maxGenerations++; // go deeper if we can't find anything at all
+                current = MiniMax(newBoard, player.Opponent, generation, maxGenerations, current);
             }
 
-            if (movesByPiecesTaken.Count > 0)
+            return current;
+        }
+
+        private class MiniMaxResult
+        {
+            public Move Move { get; set; }
+            public int MaxPlayerPiecesRemaining { get; set; }
+            public int MaxOpponentPiecesRemaining { get; set; }
+        }
+
+        private Move RandomBestMove(IEnumerable<Move> validMoves)
+        {
+            Move bestMove = Randomize(validMoves).FirstOrDefault();
+            return bestMove;
+        }
+
+        private IEnumerable<T> Randomize<T>(IEnumerable<T> input)
+        {
+            int count = input.Count();
+            List<T> inputAsList = new List<T>(input);
+
+            int[] indices = Enumerable.Range(0, count).ToArray();
+
+            for (int i = 0; i < count; ++i)
             {
-                IEnumerable<Move> bestMoves = movesByPiecesTaken.Where(x => x.Value == movesByPiecesTaken.Values.Max()).Select(x => x.Key);
-                if (bestMoves.Count() == 1)
-                {
-                    return bestMoves.First(); // we must always pick the move that takes the most pieces, if one exists
-                }
-                else
-                {
-                    Move bestMove = bestMoves.Skip(_random.Next(bestMoves.Count() - 1)).First(); // pick a random from the available best moves
-                    if (movesByPiecesTaken.Values.Max() == 0) // if none of these moves takes any pieces, we can apply extra rules...
-                    {
-                        // try not to move next to a piece that could then take you
-                        List<Move> badMoves = new List<Move>();
-                        foreach (Move move in bestMoves)
-                        {
-                            int rowStep = (Colour == PieceColour.Black ? 1 : -1);
-                            Square leftDiagonal = _game.Board[move.End.Row + rowStep, move.End.Column - 1];
-                            Square rightDiagonal = _game.Board[move.End.Row + rowStep, move.End.Column + 1];
-                            if ((leftDiagonal != null && leftDiagonal.IsOccupied && leftDiagonal.Occupier.Owner != this)
-                                || (rightDiagonal != null && rightDiagonal.IsOccupied && rightDiagonal.Occupier.Owner != this))
-                            {
-                                badMoves.Add(move);
-                            }
-                        }
-                        if (bestMoves.Any(x => !badMoves.Contains(x)))
-                        {
-                            // there are moves available that are not bad, so let's use only those
-                            bestMoves = bestMoves.Where(x => !badMoves.Contains(x));
-                        }
-
-                        // any piece that could become crowned now is the best move - pick any of those
-                        IEnumerable<Move> crownMoves = bestMoves.Where(m => !m.PieceIsCrowned &&
-                            ((Colour == PieceColour.Black && m.End.Row == 7) || (Colour == PieceColour.White && m.End.Row == 0)));
-                        if (crownMoves.Count() > 0)
-                        {
-                            bestMove = crownMoves.Skip(_random.Next(crownMoves.Count() - 1)).First();
-                            return bestMove;
-                        }
-
-                        // otherwise, make crowned pieces in the far half of the opposite side of the board go backwards preferentially to avoid corner-dwelling situations
-                        if (bestMoves.Any(m => m.PieceIsCrowned))
-                        {
-                            IEnumerable<Move> bestMoveSubset = bestMoves.Where(m => m.PieceIsCrowned &&
-                                    ((Colour == PieceColour.Black && m.End.Row <= m.Start.Row && m.End.Row > 3) || (Colour == PieceColour.White && m.End.Row >= m.Start.Row && m.End.Row < 4))
-                                );
-                            if (bestMoveSubset.Count() > 0)
-                            {
-                                bestMove = bestMoveSubset.Skip(_random.Next(bestMoveSubset.Count() - 1)).First();
-                                return bestMove;
-                            }
-                        }
-                    }
-
-                    return bestMove;
-                }
+                int position = _random.Next(i, count);
+                yield return inputAsList[indices[position]];
+                indices[position] = indices[i];
             }
-
-            return null;
         }
 
         public Player(Game game, PieceColour colour)
@@ -139,7 +137,7 @@ namespace Draughts.Core
             _game = game;
             Colour = colour;
             IsComputerPlayer = true;
-            _moveSelector = (moves, move) => move;
+            _selectMoveCallback = (moves, move) => move;
         }
     }
 }

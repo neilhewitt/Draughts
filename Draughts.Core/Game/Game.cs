@@ -10,6 +10,9 @@ namespace Draughts.Core
     {
         private static Random _random = new Random();
 
+        private int _blackTurns;
+        private int _whiteTurns;
+
         public Player BlackPlayer { get; private set; }
         public Player WhitePlayer { get; private set; }
 
@@ -24,18 +27,18 @@ namespace Draughts.Core
             GameLoop();
         }
 
-        public bool RegisterToPlay(string name, Func<IEnumerable<Move>, Move, Move> moveSelector)
+        public bool RegisterToPlay(string name, Func<IEnumerable<Move>, Move, Move> selectMoveCallback)
         {
             if (!BlackPlayer.IsComputerPlayer && !WhitePlayer.IsComputerPlayer) return false;
 
             if (BlackPlayer.IsComputerPlayer && WhitePlayer.IsComputerPlayer)
             {
                 int coinToss = _random.Next(10);
-                (coinToss % 2 == 0 ? BlackPlayer : WhitePlayer).BecomeHuman(name, moveSelector);
+                (coinToss % 2 == 0 ? BlackPlayer : WhitePlayer).BecomeHuman(name, selectMoveCallback);
             }
             else
             {
-                (BlackPlayer.IsComputerPlayer ? BlackPlayer : WhitePlayer).BecomeHuman(name, moveSelector);
+                (BlackPlayer.IsComputerPlayer ? BlackPlayer : WhitePlayer).BecomeHuman(name, selectMoveCallback);
             }
 
             return true;
@@ -45,18 +48,20 @@ namespace Draughts.Core
         {
             while (true)
             {
-                if (!TakeTurn(BlackPlayer)) break;
-                if (!TakeTurn(WhitePlayer)) break;
+                // if in the first two turns for either player, we use special best move selection behaviour
+                // to avoid always having the same opening AI moves
+                if (!TakeTurn(BlackPlayer, _blackTurns++ < 2)) break;
+                if (!TakeTurn(WhitePlayer, _whiteTurns++ < 2)) break;
             }
         }
 
-        private bool TakeTurn(Player player)
+        private bool TakeTurn(Player player, bool isStartOfGame)
         {
             Move selectedMove = null;
             Move bestMove = null;
-            IEnumerable<Move> validMoves = player.GetValidMoves(out bestMove);
+            IEnumerable<Move> validMoves = player.GetValidMoves(out bestMove, isStartOfGame);
 
-            selectedMove = player.IsComputerPlayer ? bestMove : player.MoveSelector(validMoves, bestMove);
+            selectedMove = player.IsComputerPlayer ? bestMove : player.SelectMoveCallback(validMoves, bestMove);
             if (selectedMove == null)
             {
                 GameEnds(this, new GameEndsEventArgs(player.Opponent, ReasonsForWinning.CantMove, Board.State));

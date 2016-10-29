@@ -42,6 +42,18 @@ namespace Draughts.Core
             }
         }
 
+        public Board Clone()
+        {
+            Board board = new Board(_game);
+            foreach(Square square in _grid.Select(x => x.Contents))
+            {
+                Piece newPiece = square.IsOccupied ? new Piece(square.Occupier.Colour, board, square.Row, square.Column, square.Occupier.Owner) : null;
+                Square newSquare = new Square(square.Colour, newPiece, square.Row, square.Column);
+                board._grid.Set(square.Row, square.Column, newSquare);
+            }
+            return board;
+        }
+
         public Board(Game game)
         {
             _game = game;

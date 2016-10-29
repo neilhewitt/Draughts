@@ -20,7 +20,7 @@ namespace Draughts.Core
             Occupier = null;
         }
 
-        internal void Occupy(Piece occupier)
+        internal void OccupyWith(Piece occupier)
         {
             Occupier = occupier;
         }

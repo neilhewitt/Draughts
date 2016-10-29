@@ -5,24 +5,62 @@ using System.Text;
 using System.Threading.Tasks;
 using Draughts.Core;
 using System.Threading;
+using System.IO;
 
 namespace Draughts.ConsoleApp
 {
     public class TestUI
     {
+        private string _logPath;
+        private List<string> _logEntries;
+        int _movesSinceLastPieceTaken = 0;
+        bool _flaggedStall = false;
+
         public void PreviewTurn(object sender, BeforeMoveEventArgs args)
         {
             Display(args.BoardState, args.Player, args.BestMove, false);
             Console.SetCursorPosition(0, 17);
             Move move = args.BestMove;
-            Console.WriteLine(args.Player.Name + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
+            ConsoleWriteLineAndLog(args.Player.Colour.ToString() + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
                 + move.PiecesTaken + " pieces           ");
-            Thread.Sleep(300);
+            //if (move.PiecesTaken > 0)
+                //Thread.Sleep(300);
+            //else Console.ReadKey();
         }
 
         public void PlayerTakesTurn(object sender, MoveEventArgs args)
         {
             Display(args.BoardState, args.Player, args.Move, false);
+            string state = "";
+            int row = 0;
+            foreach(SquareInfo info in args.BoardState.Squares)
+            {
+                if (info.Row > row)
+                {
+                    row = info.Row;
+                    state += "|";
+                }
+
+                state += info.PieceInfo != null ? info.PieceInfo.Colour == PieceColour.Black ? (info.PieceInfo.IsCrowned ? "b" : "B") : (info.PieceInfo.IsCrowned ? "w" : "W") : "0";
+            }
+            Log("State: " + state);
+
+            if (args.Move.PiecesTaken > 0)
+            {
+                Log("Black has " + args.BoardState.BlackPiecesRemaining + " pieces remaining, White has " + args.BoardState.WhitePiecesRemaining + " pieces remaining.");
+                _movesSinceLastPieceTaken = 0;
+                _flaggedStall = false;
+            }
+            else
+            {
+                _movesSinceLastPieceTaken++;
+            }
+
+            if (_movesSinceLastPieceTaken > 10 && !_flaggedStall)
+            {
+                Log("- STALLED");
+                _flaggedStall = true;
+            }
         }
 
         public void GameEnds(object sender, GameEndsEventArgs args)
@@ -31,10 +69,24 @@ namespace Draughts.ConsoleApp
             if (args.ReasonPlayerWon == ReasonsForWinning.CantMove) Console.WriteLine(args.Winner.Opponent.Name + " (" + args.Winner.Opponent.Colour + ") cannot play, and loses the game.\n");
             //Console.WriteLine("\n" + args.Winner.Name + " (" + args.Winner.Colour + ") WINS!!!\n\nPress any key to play again.");
             //Console.Read();
+            Log("---- GAME ENDS " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + " ----");
+            FlushLog();
         }
 
         public void Display(BoardState state, Player player, Move bestMove = null, bool clearFirst = true, IEnumerable<Move> allMoves = null)
         {
+            if (allMoves != null)
+            {
+                string log = "Valid moves are: ";
+                foreach (Move move in allMoves)
+                {
+                    log += "(" + move.Start.Row + ", " + move.Start.Column + ") : (" + move.End.Row + ", " + move.End.Column + "); ";
+                }
+                Log(log);
+
+                if (bestMove != null) Log("Best move is: (" + bestMove.Start.Row + ", " + bestMove.Start.Column + ") : (" + bestMove.End.Row + ", " + bestMove.End.Column + ")");
+            }
+
             if (clearFirst)
             {
                 Console.Clear();
@@ -47,7 +99,7 @@ namespace Draughts.ConsoleApp
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
-            Console.WriteLine(player.Name + " (" + player.Colour.ToString() + ") plays                     \n");
+            Console.Write(player.Name + " (" + player.Colour.ToString() + ") plays                     \n");
 
             SquareColour current = SquareColour.Yellow;
             Console.Write("\t 01234567");
@@ -101,14 +153,38 @@ namespace Draughts.ConsoleApp
                 current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
             }
             Console.Write("\t\n\n");
-            Console.WriteLine("Black has " + state.BlackPiecesRemaining + " pieces remaining, White has " + state.WhitePiecesRemaining + " pieces remaining.");
+            Console.Write("Black has " + state.BlackPiecesRemaining + " pieces remaining, White has " + state.WhitePiecesRemaining + " pieces remaining.");
         }
 
-        public TestUI(Game game)
+        private void Log(string message)
         {
+            _logEntries.Add(message);
+            if (_logEntries.Count() > 20) FlushLog();
+        }
+
+        private void ConsoleWriteLineAndLog(string message)
+        {
+            Console.WriteLine(message);
+            Log(message.Replace("\t", "").Replace("\n", ""));
+        }
+
+        private void FlushLog()
+        {
+            File.AppendAllLines(_logPath, _logEntries);
+            _logEntries.Clear();
+        }
+
+        public TestUI(Game game, string logPath)
+        {
+            _logPath = logPath;
+            _logEntries = new List<string>();
             game.BeforePlayerMoves += PreviewTurn;
             game.PlayerMoves += PlayerTakesTurn;
             game.GameEnds += GameEnds;
+
+            Log("---- GAME BEGINS " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + " ----");
+            Log(game.BlackPlayer.Name + " plays Black");
+            Log(game.WhitePlayer.Name + " plays White");
         }
     }
 }

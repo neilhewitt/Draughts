@@ -28,7 +28,7 @@ namespace Draughts.Core
                 }
                 if (step == move.Steps.Last())
                 {
-                    square.Occupy(this);
+                    square.OccupyWith(this);
                     _row = square.Row;
                     _column = square.Column;
                 }
@@ -37,7 +37,7 @@ namespace Draughts.Core
                     if (square.IsOccupied)
                     {
                         square.Clear();
-                        Owner.TakePiece();
+                        Owner.CapturedAPiece();
                     }
                 }
             }

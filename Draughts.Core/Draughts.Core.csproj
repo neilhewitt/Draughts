@@ -54,7 +54,7 @@
     <Compile Include="Game\EventArgs\GameEndsEventArgs.cs" />
     <Compile Include="Game\EventArgs\MoveEventArgs.cs" />
     <Compile Include="Moves\Move.cs" />
-    <Compile Include="Player\Piece.cs" />
+    <Compile Include="Board\Piece.cs" />
     <Compile Include="Player\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Moves\MoveMap\MoveMap.cs" />
