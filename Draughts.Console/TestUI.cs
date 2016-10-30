@@ -24,8 +24,9 @@ namespace Draughts.ConsoleApp
             ConsoleWriteLineAndLog(args.Player.Colour.ToString() + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
                 + move.PiecesTaken + " pieces           ");
             //if (move.PiecesTaken > 0)
-                //Thread.Sleep(300);
-            //else Console.ReadKey();
+            //Thread.Sleep(300);
+            //else 
+            //Console.ReadKey();
         }
 
         public void PlayerTakesTurn(object sender, MoveEventArgs args)
@@ -137,12 +138,12 @@ namespace Draughts.ConsoleApp
                         if (piece.IsCrowned)
                         {
                             Console.ForegroundColor = piece.Colour == PieceColour.Black ? ConsoleColor.Black : ConsoleColor.White;
-                            Console.Write((piece.Colour == PieceColour.Black ? "b" : "w"));
+                            Console.Write("X");
                         }
                         else
                         {
                             Console.ForegroundColor = piece.Colour == PieceColour.Black ? ConsoleColor.Black : ConsoleColor.White;
-                            Console.Write((piece.Colour == PieceColour.Black ? "B" : "W"));
+                            Console.Write("O");
                         }
                     }
 
@@ -153,7 +154,7 @@ namespace Draughts.ConsoleApp
                 current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
             }
             Console.Write("\t\n\n");
-            Console.Write("Black has " + state.BlackPiecesRemaining + " pieces remaining, White has " + state.WhitePiecesRemaining + " pieces remaining.");
+            Console.Write("Black has " + state.BlackPiecesRemaining + " pieces remaining, White has " + state.WhitePiecesRemaining + " pieces remaining.    ");
         }
 
         private void Log(string message)
@@ -170,7 +171,7 @@ namespace Draughts.ConsoleApp
 
         private void FlushLog()
         {
-            File.AppendAllLines(_logPath, _logEntries);
+            //File.AppendAllLines(_logPath, _logEntries);
             _logEntries.Clear();
         }
 

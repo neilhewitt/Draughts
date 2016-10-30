@@ -27,7 +27,7 @@ namespace Draughts.Core
         {
             IEnumerable<Move> validMoves = Core.Move.ValidMovesFor(_game.Board, this);
             // we can use either random best move (pick any from valid moves) or MiniMax (AI play-ahead up to n generations)
-            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, 4);
+            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, 3);
             {
                 if (bestMove != null && bestMove.PiecesTaken > 0)
                 {
@@ -64,24 +64,48 @@ namespace Draughts.Core
             // minmax algorithm plays n moves ahead and notes which move at the first level leads to the least opponent pieces remaining and the most player pieces remaining
             // which it recommends as the best move
             Board newBoard = _game.Board.Clone();
-            MiniMaxResult result = MiniMax(newBoard, this, 0, maxMovesAhead, null, validMoves);
+            MiniMaxResult playerResult = new MiniMaxResult();
+            MiniMaxResult opponentResult = new MiniMaxResult();
+            MiniMax(newBoard, this, 0, 0, maxMovesAhead, playerResult, opponentResult);
 
+            Move bestMove = playerResult.BestMovePerGeneration[1];
             // if best move takes no pieces but valid moves do take pieces, we have to pick one (any one) that takes pieces
-            if (result.Move != null && result.Move.PiecesTaken == 0 && validMoves.Any(m => m.PiecesTaken > 0)) return RandomBestMove(validMoves);
+            if (bestMove != null && bestMove.PiecesTaken == 0 && validMoves.Any(m => m.PiecesTaken > 0))
+                return RandomBestMove(validMoves.Where(m => m.PiecesTaken > 0));
+            // if no moves take any pieces but there are crowned pieces in the lower half of the opposite board, filter only the
+            // backwards moves to encourage them to move back into the middle
+            // a sufficient MiniMax depth would reveal this but would take too long :-(
+            if (bestMove != null && bestMove.PiecesTaken == 0)
+            {
+                IEnumerable<Move> crownedMoves = validMoves.Where(m => m.PieceIsCrowned &&
+                ((Colour == PieceColour.Black && m.Start.Row > 3 && m.End.Row < m.Start.Row) || (Colour == PieceColour.White && m.Start.Row < 4 && m.End.Row > m.Start.Row)));
+                if (crownedMoves.Count() > 0)
+                    return RandomBestMove(crownedMoves);
+            }
             // sometimes there is no best move within n moves ahead, so just use a random of the valid moves available
-            if (result.Move == null) return RandomBestMove(validMoves);
+            if (bestMove == null)
+                return RandomBestMove(validMoves);
             // otherwise, return the recommended best move
-            return result.Move;
+            return bestMove;
         }
 
-        private MiniMaxResult MiniMax(Board board, Player player, int generation, int maxGenerations, MiniMaxResult current, IEnumerable<Move> validMoves = null)
+        private int _timesThrough;
+
+        private void MiniMax(Board board, Player player, int playerGeneration, int opponentGeneration, int maxGenerations, MiniMaxResult playerResult, MiniMaxResult opponentResult)
         {
-            if (current == null) current = new MiniMaxResult() { Move = null, MaxPlayerPiecesRemaining = 0, MaxOpponentPiecesRemaining = 12 };
-            if (generation >= maxGenerations || current.MaxOpponentPiecesRemaining == 0) // we've reached the limit, or a winning move has been found already
-                return current;
-            generation++;
-            
-            validMoves = validMoves ?? Core.Move.ValidMovesFor(board, player);
+            _timesThrough++;
+            playerGeneration++;
+            if (playerGeneration >= maxGenerations || playerResult.OpponentPiecesRemaining == 0)
+            {
+                return; // we've reached the limit, or a winning move has been found already
+            }
+                        
+            IEnumerable<Move> validMoves = Core.Move.ValidMovesFor(board, player);
+            if (!playerResult.BestMovePerGeneration.ContainsKey(playerGeneration))
+            {
+                playerResult.BestMovePerGeneration.Add(playerGeneration, null);
+            }
+
             foreach(Move move in Randomize(validMoves)) // randomize the move order to avoid first-place bias for sets of equally good moves
             {
                 Board newBoard = board.Clone();
@@ -89,25 +113,29 @@ namespace Draughts.Core
 
                 int playerCount = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player);
                 int opponentCount = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player.Opponent);
-                if (opponentCount < current.MaxOpponentPiecesRemaining || playerCount > current.MaxPlayerPiecesRemaining)
+                if (opponentCount < playerResult.OpponentPiecesRemaining || playerResult.BestMovePerGeneration[playerGeneration] == null)
                 {
-                    if (generation == 1) current.Move = move; // only 1st generation moves are actually valid, others are projections
-                    current.MaxPlayerPiecesRemaining = playerCount;
-                    current.MaxOpponentPiecesRemaining = opponentCount;
+                    playerResult.PlayerPiecesRemaining = playerCount;
+                    playerResult.OpponentPiecesRemaining = opponentCount;
+                    playerResult.BestMovePerGeneration[playerGeneration] = move;
                 }
 
-                if (current.Move == null) maxGenerations++; // go deeper if we can't find anything at all
-                current = MiniMax(newBoard, player.Opponent, generation, maxGenerations, current);
+                MiniMax(newBoard, player.Opponent, opponentGeneration, playerGeneration, maxGenerations, opponentResult, playerResult);
             }
-
-            return current;
         }
 
         private class MiniMaxResult
         {
-            public Move Move { get; set; }
-            public int MaxPlayerPiecesRemaining { get; set; }
-            public int MaxOpponentPiecesRemaining { get; set; }
+            public Dictionary<int, Move> BestMovePerGeneration;
+            public int PlayerPiecesRemaining { get; set; }
+            public int OpponentPiecesRemaining { get; set; }
+
+            public MiniMaxResult()
+            {
+                PlayerPiecesRemaining = 0;
+                OpponentPiecesRemaining = 12;
+                BestMovePerGeneration = new Dictionary<int, Core.Move>();
+            }
         }
 
         private Move RandomBestMove(IEnumerable<Move> validMoves)
