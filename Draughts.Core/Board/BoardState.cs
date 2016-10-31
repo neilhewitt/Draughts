@@ -15,6 +15,7 @@ namespace Draughts.Core
         public IEnumerable<SquareInfo> Squares => _squares;
         public int BlackPiecesRemaining => _squares.Where(s => s.PieceInfo != null && s.PieceInfo.Colour == PieceColour.Black).Count();
         public int WhitePiecesRemaining => _squares.Where(s => s.PieceInfo != null && s.PieceInfo.Colour == PieceColour.White).Count();
+        public string StateData { get; }
 
         public SquareInfo For(int row, int column)
         {
@@ -26,6 +27,7 @@ namespace Draughts.Core
             _squares = new List<SquareInfo>(
                 board.Squares.Select(s => new SquareInfo(s.Row, s.Column, s.Occupier != null ? new PieceInfo(s.Occupier.Colour, s.Occupier.IsCrowned) : null))
                 );
+            StateData = board.StateData;
         }
     }
 }

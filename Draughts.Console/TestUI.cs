@@ -26,7 +26,7 @@ namespace Draughts.ConsoleApp
             //if (move.PiecesTaken > 0)
             //Thread.Sleep(300);
             //else 
-            //Console.ReadKey();
+            Console.ReadKey();
         }
 
         public void PlayerTakesTurn(object sender, MoveEventArgs args)
@@ -100,7 +100,7 @@ namespace Draughts.ConsoleApp
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
-            Console.Write(player.Name + " (" + player.Colour.ToString() + ") plays                     \n");
+            Console.Write(player.Name + " (" + player.Colour.ToString() + ") plays                     \n\n");
 
             SquareColour current = SquareColour.Yellow;
             Console.Write("\t 01234567");
@@ -109,9 +109,9 @@ namespace Draughts.ConsoleApp
                 Console.Write("\t\n\t" + i.ToString());
                 for (int j = 0; j < 8; j++)
                 {
-                    if (current == SquareColour.White)
+                    if (current == SquareColour.Gray)
                     {
-                        Console.BackgroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Gray;
                     }
                     else
                     {
@@ -149,9 +149,9 @@ namespace Draughts.ConsoleApp
 
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.White;
-                    current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
+                    current = current == SquareColour.Yellow ? SquareColour.Gray : SquareColour.Yellow;
                 }
-                current = current == SquareColour.Yellow ? SquareColour.White : SquareColour.Yellow;
+                current = current == SquareColour.Yellow ? SquareColour.Gray : SquareColour.Yellow;
             }
             Console.Write("\t\n\n");
             Console.Write("Black has " + state.BlackPiecesRemaining + " pieces remaining, White has " + state.WhitePiecesRemaining + " pieces remaining.    ");
@@ -179,6 +179,7 @@ namespace Draughts.ConsoleApp
         {
             _logPath = logPath;
             _logEntries = new List<string>();
+            game.BeforeGameStarts += (sender, e) => Display(e.State, e.BlackPlayer);
             game.BeforePlayerMoves += PreviewTurn;
             game.PlayerMoves += PlayerTakesTurn;
             game.GameEnds += GameEnds;

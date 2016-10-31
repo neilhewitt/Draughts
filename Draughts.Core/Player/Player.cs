@@ -69,31 +69,39 @@ namespace Draughts.Core
             MiniMax(newBoard, this, 0, 0, maxMovesAhead, playerResult, opponentResult);
 
             Move bestMove = playerResult.BestMovePerGeneration[1];
+            
+            // SPECIAL CASES
+            
             // if best move takes no pieces but valid moves do take pieces, we have to pick one (any one) that takes pieces
+            // cos that's the rules of Draughts!
             if (bestMove != null && bestMove.PiecesTaken == 0 && validMoves.Any(m => m.PiecesTaken > 0))
                 return RandomBestMove(validMoves.Where(m => m.PiecesTaken > 0));
-            // if no moves take any pieces but there are crowned pieces in the lower half of the opposite board, filter only the
-            // backwards moves to encourage them to move back into the middle
-            // a sufficient MiniMax depth would reveal this but would take too long :-(
+            
+            // if no moves capture any pieces, but there are crowned pieces in the lower half of the opponent board, only consider the
+            // backwards moves, to encourage them to move back into the middle and avoid permanent end-dwelling
+            // a sufficient MiniMax depth would reveal this but would take far too long :-(
             if (bestMove != null && bestMove.PiecesTaken == 0)
             {
                 IEnumerable<Move> crownedMoves = validMoves.Where(m => m.PieceIsCrowned &&
-                ((Colour == PieceColour.Black && m.Start.Row > 3 && m.End.Row < m.Start.Row) || (Colour == PieceColour.White && m.Start.Row < 4 && m.End.Row > m.Start.Row)));
+                    ((Colour == PieceColour.Black && m.Start.Row > 3 && m.End.Row < m.Start.Row) || (Colour == PieceColour.White && m.Start.Row < 4 && m.End.Row > m.Start.Row)));
                 if (crownedMoves.Count() > 0)
+                {
                     return RandomBestMove(crownedMoves);
+                }
             }
+
             // sometimes there is no best move within n moves ahead, so just use a random of the valid moves available
             if (bestMove == null)
+            {
                 return RandomBestMove(validMoves);
+            }
+            
             // otherwise, return the recommended best move
             return bestMove;
         }
 
-        private int _timesThrough;
-
         private void MiniMax(Board board, Player player, int playerGeneration, int opponentGeneration, int maxGenerations, MiniMaxResult playerResult, MiniMaxResult opponentResult)
         {
-            _timesThrough++;
             playerGeneration++;
             if (playerGeneration >= maxGenerations || playerResult.OpponentPiecesRemaining == 0)
             {

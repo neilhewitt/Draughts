@@ -15,16 +15,6 @@ namespace Draughts.Core
         public bool IsOccupied => Occupier != null;
         public bool IsEmpty => !IsOccupied;
 
-        internal void Clear()
-        {
-            Occupier = null;
-        }
-
-        internal void OccupyWith(Piece occupier)
-        {
-            Occupier = occupier;
-        }
-
         public Square(SquareColour colour, Piece occupier, int row, int column)
         {
             Colour = colour;
@@ -36,6 +26,6 @@ namespace Draughts.Core
 
     public enum SquareColour
     {
-        Yellow, White
+        Yellow, Gray
     }
 }

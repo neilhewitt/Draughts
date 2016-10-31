@@ -30,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlexGrid, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FlexGrid.1.0.0\lib\net452\FlexGrid.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,6 +45,7 @@
     <Compile Include="Board\BoardState.cs" />
     <Compile Include="Board\PieceInfo.cs" />
     <Compile Include="Board\SquareInfo.cs" />
+    <Compile Include="Game\EventArgs\BeforeGameStartsEventArgs.cs" />
     <Compile Include="Game\EventArgs\BeforeMoveEventArgs.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\EventArgs\GameEndsEventArgs.cs" />

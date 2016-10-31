@@ -13,7 +13,7 @@ namespace Draughts.Core
         private int _column;
 
         public PieceColour Colour { get; }
-        public bool IsCrowned { get; private set; }
+        public bool IsCrowned { get; internal set; }
 
         public Player Owner { get; }
 
@@ -24,11 +24,11 @@ namespace Draughts.Core
                 Square square = _board[step.Row, step.Column];
                 if (step == move.Steps.First())
                 {
-                    square.Clear();
+                    _board.Clear(step.Row, step.Column);
                 }
                 if (step == move.Steps.Last())
                 {
-                    square.OccupyWith(this);
+                    _board.Occupy(step.Row, step.Column, this);
                     _row = square.Row;
                     _column = square.Column;
                 }
@@ -36,7 +36,7 @@ namespace Draughts.Core
                 {
                     if (square.IsOccupied)
                     {
-                        square.Clear();
+                        _board.Clear(step.Row, step.Column);
                         Owner.CapturedAPiece();
                     }
                 }
@@ -45,6 +45,7 @@ namespace Draughts.Core
             if ((_row == 0 && Colour == PieceColour.White) || (_row == 7 && Colour == PieceColour.Black))
             {
                 IsCrowned = true;
+                _board.Occupy(_row, _column, this);
             }
         }
 

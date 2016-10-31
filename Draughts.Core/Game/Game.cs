@@ -16,6 +16,7 @@ namespace Draughts.Core
         public Player BlackPlayer { get; private set; }
         public Player WhitePlayer { get; private set; }
 
+        public event EventHandler<BeforeGameStartsEventArgs> BeforeGameStarts;
         public event EventHandler<BeforeMoveEventArgs> BeforePlayerMoves;
         public event EventHandler<MoveEventArgs> PlayerMoves;
         public event EventHandler<GameEndsEventArgs> GameEnds;
@@ -24,6 +25,7 @@ namespace Draughts.Core
 
         public void Play()
         {
+            BeforeGameStarts(this, new BeforeGameStartsEventArgs(Board.State, BlackPlayer, WhitePlayer));
             GameLoop();
         }
 
@@ -87,8 +89,7 @@ namespace Draughts.Core
             WhitePlayer = new Player(this, PieceColour.White);
 
             Board = new Board(this);
-            Board.Initialise();
-
+            this.BeforeGameStarts += (sender, e) => { };
             this.BeforePlayerMoves += (sender, e) => { };
             this.PlayerMoves += (sender, e) => { };
             this.GameEnds += (sender, e) => { };
