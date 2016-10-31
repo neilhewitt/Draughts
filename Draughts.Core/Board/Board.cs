@@ -54,6 +54,21 @@ namespace Draughts.Core
             return board;
         }
 
+        public override string ToString()
+        {
+            string output = "";
+            for (int row = 0; row < 8; row++)
+            {
+                for (int column = 0; column < 8; column++)
+                {
+                    Square square = this[row, column];
+                    output += square != null ? square.IsOccupied ? square.Occupier.IsCrowned ? square.Occupier.Colour == PieceColour.Black ? "b" : "w" : square.Occupier.Colour == PieceColour.White ? "B" : "W" : "_" : "?";
+                }
+                output += "\n";
+            }
+            return output;
+        }
+
         public Board(Game game)
         {
             _game = game;

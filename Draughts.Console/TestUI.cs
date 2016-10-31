@@ -100,7 +100,7 @@ namespace Draughts.ConsoleApp
             Console.WriteLine("SuperDraughts (C)2016 Zero Point Systems Ltd");
             Console.WriteLine("--------------------------------------------");
             Console.Write("\n");
-            Console.Write(player.Name + " (" + player.Colour.ToString() + ") plays                     \n");
+            Console.Write(player.Name + " (" + player.Colour.ToString() + ") plays                     \n\n");
 
             SquareColour current = SquareColour.Yellow;
             Console.Write("\t 01234567");
