@@ -54,6 +54,17 @@ namespace Draughts.Core
             return board;
         }
 
+        public IEnumerable<Move> ValidMovesFor(Player player)
+        {
+            List<Move> validMoves = new List<Move>();
+            foreach (Piece piece in Squares.Where(s => s.IsOccupied && s.Occupier.Owner == player).Select(s => s.Occupier))
+            {
+                validMoves.AddRange(piece.GetMoves());
+            }
+
+            return validMoves;
+        }
+
         public override string ToString()
         {
             string output = "";

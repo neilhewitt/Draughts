@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\MiniMax.cs" />
+    <Compile Include="AI\MiniMaxResult.cs" />
     <Compile Include="Board\Board.cs" />
     <Compile Include="Board\BoardState.cs" />
     <Compile Include="Board\PieceInfo.cs" />
@@ -55,6 +57,7 @@
     <Compile Include="Game\EventArgs\MoveEventArgs.cs" />
     <Compile Include="Moves\Move.cs" />
     <Compile Include="Board\Piece.cs" />
+    <Compile Include="DraughtsExtensions.cs" />
     <Compile Include="Player\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Moves\MoveMap\MoveMap.cs" />

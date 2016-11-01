@@ -59,7 +59,7 @@ namespace Draughts.Core
         {
             Move selectedMove = null;
             Move bestMove = null;
-            IEnumerable<Move> validMoves = player.GetValidMoves(out bestMove, isStartOfGame);
+            IEnumerable<Move> validMoves = player.GetAvailableMoves(out bestMove, isStartOfGame);
 
             selectedMove = player.IsComputerPlayer ? bestMove : player.SelectMoveCallback(validMoves, bestMove);
             if (selectedMove == null)

@@ -23,10 +23,7 @@ namespace Draughts.ConsoleApp
             Move move = args.BestMove;
             ConsoleWriteLineAndLog(args.Player.Colour.ToString() + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
                 + move.PiecesTaken + " pieces           ");
-            //if (move.PiecesTaken > 0)
-            //Thread.Sleep(300);
-            //else 
-            //Console.ReadKey();
+            //Thread.Sleep(1000);
         }
 
         public void PlayerTakesTurn(object sender, MoveEventArgs args)
@@ -138,7 +135,7 @@ namespace Draughts.ConsoleApp
                         if (piece.IsCrowned)
                         {
                             Console.ForegroundColor = piece.Colour == PieceColour.Black ? ConsoleColor.Black : ConsoleColor.White;
-                            Console.Write("X");
+                            Console.Write("0");
                         }
                         else
                         {
@@ -159,8 +156,8 @@ namespace Draughts.ConsoleApp
 
         private void Log(string message)
         {
-            _logEntries.Add(message);
-            if (_logEntries.Count() > 20) FlushLog();
+            //_logEntries.Add(message);
+            //if (_logEntries.Count() > 20) FlushLog();
         }
 
         private void ConsoleWriteLineAndLog(string message)
@@ -172,7 +169,7 @@ namespace Draughts.ConsoleApp
         private void FlushLog()
         {
             //File.AppendAllLines(_logPath, _logEntries);
-            _logEntries.Clear();
+            //_logEntries.Clear();
         }
 
         public TestUI(Game game, string logPath)

@@ -8,21 +8,6 @@ namespace Draughts.Core
 {
     public class Move
     {
-        #region static
-
-        public static IEnumerable<Move> ValidMovesFor(Board board, Player player)
-        {
-            List<Move> validMoves = new List<Move>();
-            foreach (Piece piece in board.Squares.Where(s => s.IsOccupied && s.Occupier.Owner == player).Select(s => s.Occupier))
-            {
-                validMoves.AddRange(piece.GetMoves());
-            }
-
-            return validMoves;
-        }
-
-        #endregion
-
         private IList<MoveStep> _steps;
 
         public MoveStep Start => _steps.FirstOrDefault();
