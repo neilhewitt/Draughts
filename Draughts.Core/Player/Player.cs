@@ -8,6 +8,8 @@ namespace Draughts.Core
 {
     public class Player
     {
+        private static int MAX_MOVES_AHEAD = 7; // above this, the AI can take unacceptably long to respond
+
         private static Random _random = new Random(DateTime.Now.Millisecond);
 
         private Game _game;
@@ -27,7 +29,7 @@ namespace Draughts.Core
         {
             IEnumerable<Move> validMoves = _game.Board.ValidMovesFor(this);
             // we can use either random best move (pick any from valid moves) or MiniMax (AI play-ahead up to n generations)
-            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, 6);
+            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, MAX_MOVES_AHEAD);
             {
                 if (bestMove != null && bestMove.PiecesTaken > 0)
                 {

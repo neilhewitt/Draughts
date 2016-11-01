@@ -64,13 +64,14 @@ namespace Draughts.Core
                 Board newBoard = board.Clone();
                 newBoard[move.Start.Row, move.Start.Column].Occupier.Move(move);
 
-                int playerCount = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player);
-                int opponentCount = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player.Opponent);
-                if (opponentCount <= playerResult.OpponentPiecesRemaining || playerCount > opponentResult.PlayerPiecesRemaining 
+                int playerPieces = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player);
+                int opponentPieces = newBoard.Squares.Count(s => s.IsOccupied && s.Occupier.Owner == player.Opponent);
+                if (opponentPieces <= playerResult.OpponentPiecesRemaining || playerPieces > opponentResult.PlayerPiecesRemaining 
                     || playerResult.BestMovePerGeneration[playerGeneration] == null)
                 {
-                    playerResult.PlayerPiecesRemaining = playerCount;
-                    playerResult.OpponentPiecesRemaining = opponentCount;
+                    // only go any further if there's an advantage to me
+                    playerResult.PlayerPiecesRemaining = playerPieces;
+                    playerResult.OpponentPiecesRemaining = opponentPieces;
                     playerResult.BestMovePerGeneration[playerGeneration] = move;
                     GenerateMiniMax(newBoard, player.Opponent, opponentGeneration, playerGeneration, maxGenerations, opponentResult, playerResult);
                 }
