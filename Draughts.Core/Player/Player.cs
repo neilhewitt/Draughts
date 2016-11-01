@@ -27,7 +27,7 @@ namespace Draughts.Core
         {
             IEnumerable<Move> validMoves = _game.Board.ValidMovesFor(this);
             // we can use either random best move (pick any from valid moves) or MiniMax (AI play-ahead up to n generations)
-            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, 2);
+            bestMove = useRandomBestMove ? RandomBestMove(validMoves) : MiniMaxBestMove(validMoves, 6);
             {
                 if (bestMove != null && bestMove.PiecesTaken > 0)
                 {
