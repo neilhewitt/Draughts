@@ -1,9 +1,0 @@
-C:\Projects\Draughts\Draughts.Console\bin\Debug\Draughts.Console.exe.config
-C:\Projects\Draughts\Draughts.Console\bin\Debug\Draughts.Console.exe
-C:\Projects\Draughts\Draughts.Console\bin\Debug\Draughts.Console.pdb
-C:\Projects\Draughts\Draughts.Console\bin\Debug\Draughts.Core.dll
-C:\Projects\Draughts\Draughts.Console\bin\Debug\Draughts.Core.pdb
-C:\Projects\Draughts\Draughts.Console\obj\Debug\Draughts.Console.csprojResolveAssemblyReference.cache
-C:\Projects\Draughts\Draughts.Console\obj\Debug\Draughts.Console.exe
-C:\Projects\Draughts\Draughts.Console\obj\Debug\Draughts.Console.pdb
-C:\Projects\Draughts\Draughts.Console\bin\Debug\FlexGrid.dll

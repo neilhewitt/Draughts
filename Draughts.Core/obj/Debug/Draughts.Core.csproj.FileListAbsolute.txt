@@ -1,7 +1,0 @@
-C:\Projects\Draughts\Draughts.Core\bin\Debug\Draughts.Core.dll
-C:\Projects\Draughts\Draughts.Core\bin\Debug\Draughts.Core.pdb
-C:\Projects\Draughts\Draughts.Core\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-C:\Projects\Draughts\Draughts.Core\obj\Debug\Draughts.Core.csprojResolveAssemblyReference.cache
-C:\Projects\Draughts\Draughts.Core\obj\Debug\Draughts.Core.dll
-C:\Projects\Draughts\Draughts.Core\obj\Debug\Draughts.Core.pdb
-C:\Projects\Draughts\Draughts.Core\bin\Debug\FlexGrid.dll
