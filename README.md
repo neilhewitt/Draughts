@@ -4,6 +4,8 @@ This is a fairly naive implementation of English Draughts (AKA American Checkers
 
 I designed this code for comprehension, not speed or simplicity. There are smaller, faster and better ways to store and process board state, find valid moves, and draw a UI. If you're looking for a complete human-playable game of Draughts, look elsewhere. If you're looking for code on which to base a 'proper' Draughts implementation, you might want to look elsewhere as well, although you're free to use this code if you like, subject to the terms of the license below (which is also found in the file license.txt in the root of this project).
 
+Requires: .NET 4.5.2 - could probably be ported to .NET Core but I'm not doing that anytime soon...
+
 LICENSE
 -------
 
