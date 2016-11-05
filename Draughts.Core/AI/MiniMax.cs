@@ -16,6 +16,7 @@ namespace Draughts.Core
             // minimax algorithm plays n moves ahead and notes which move at the first level leads to the least opponent pieces remaining and the most player pieces remaining
             // which it recommends as the best move
             Board newBoard = _game.Board.Clone();
+
             MiniMaxResult playerResult = new MiniMaxResult();
             MiniMaxResult opponentResult = new MiniMaxResult();
             GenerateMiniMax(newBoard, _player, 0, 0, maxMovesAhead, playerResult, opponentResult);
@@ -69,10 +70,12 @@ namespace Draughts.Core
                 if (opponentPieces <= playerResult.OpponentPiecesRemaining || playerPieces > opponentResult.PlayerPiecesRemaining 
                     || playerResult.BestMovePerGeneration[playerGeneration] == null)
                 {
-                    // only go any further if there's an advantage to me
+                    // only go any further down this tree branch if there's an advantage to me compared to other branches
                     playerResult.PlayerPiecesRemaining = playerPieces;
                     playerResult.OpponentPiecesRemaining = opponentPieces;
                     playerResult.BestMovePerGeneration[playerGeneration] = move;
+
+                    // now play the opponent's move set for this generation, and so on down the tree until maxGenerations is reached or tree branch is pruned
                     GenerateMiniMax(newBoard, player.Opponent, opponentGeneration, playerGeneration, maxGenerations, opponentResult, playerResult);
                 }
             }
