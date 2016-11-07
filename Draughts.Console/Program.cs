@@ -20,7 +20,7 @@ namespace Draughts.ConsoleApp
             while (iterations-- > 0)
             {
                 Game game = new Game();
-                TestUI ui = new TestUI(game, args[0] == "-log" ? path : null);
+                TestUI ui = new TestUI(game, args.Length > 0 ? args[0] == "-log" ? path : null : null);
                 game.RegisterToPlay("John", (moves, move) => move);
                 game.RegisterToPlay("Slartibartfast", (moves, move) => move);
                 game.Play();
