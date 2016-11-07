@@ -23,7 +23,6 @@ namespace Draughts.ConsoleApp
             Move move = args.BestMove;
             ConsoleWriteLineAndLog(args.Player.Colour.ToString() + " says: my move will be (" + move.Start.Row + ", " + move.Start.Column + ") to (" + move.End.Row + ", " + move.End.Column + ") taking " 
                 + move.PiecesTaken + " pieces           ");
-            //Thread.Sleep(1000);
         }
 
         public void PlayerTakesTurn(object sender, MoveEventArgs args)
@@ -65,8 +64,6 @@ namespace Draughts.ConsoleApp
         {
             Display(args.BoardState, args.Winner, null);
             if (args.ReasonPlayerWon == ReasonsForWinning.CantMove) Console.WriteLine(args.Winner.Opponent.Name + " (" + args.Winner.Opponent.Colour + ") cannot play, and loses the game.\n");
-            //Console.WriteLine("\n" + args.Winner.Name + " (" + args.Winner.Colour + ") WINS!!!\n\nPress any key to play again.");
-            //Console.Read();
             Log("---- GAME ENDS " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + " ----");
             FlushLog();
         }
@@ -156,8 +153,8 @@ namespace Draughts.ConsoleApp
 
         private void Log(string message)
         {
-            //_logEntries.Add(message);
-            //if (_logEntries.Count() > 20) FlushLog();
+            _logEntries.Add(message);
+            if (_logEntries.Count() > 20) FlushLog();
         }
 
         private void ConsoleWriteLineAndLog(string message)
@@ -168,14 +165,18 @@ namespace Draughts.ConsoleApp
 
         private void FlushLog()
         {
-            //File.AppendAllLines(_logPath, _logEntries);
-            //_logEntries.Clear();
+            if (_logPath != null)
+            {
+                File.AppendAllLines(_logPath, _logEntries);
+                _logEntries.Clear();
+            }
         }
 
         public TestUI(Game game, string logPath)
         {
             _logPath = logPath;
             _logEntries = new List<string>();
+
             game.BeforePlayerMoves += PreviewTurn;
             game.PlayerMoves += PlayerTakesTurn;
             game.GameEnds += GameEnds;
