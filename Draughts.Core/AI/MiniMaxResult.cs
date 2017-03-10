@@ -14,11 +14,23 @@ namespace Draughts.Core
 
         internal Dictionary<int, Move> BestMovePerGeneration { get; }
 
+        public void RegisterBestMove(Move move, int generationNumber)
+        {
+            if (BestMovePerGeneration.ContainsKey(generationNumber))
+            {
+                BestMovePerGeneration[generationNumber] = move;
+            }
+            else
+            {
+                BestMovePerGeneration.Add(generationNumber, move);
+            }
+        }
+
         public MiniMaxResult()
         {
             PlayerPiecesRemaining = 0;
             OpponentPiecesRemaining = 12;
-            BestMovePerGeneration = new Dictionary<int, Core.Move>();
+            BestMovePerGeneration = new Dictionary<int, Core.Move>() { { 1, null } };
         }
     }
 }

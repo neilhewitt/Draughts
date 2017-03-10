@@ -14,7 +14,9 @@ namespace Draughts.Core
 
         public PieceColour Colour { get; }
         public bool IsCrowned { get; private set; }
-
+        public Board Board => _board;
+        public Square Square => _board[_row, _column];
+        public IEnumerable<Move> ValidMoves => new MoveMap(this).Moves;
         public Player Owner { get; }
 
         internal void Move(Move move)
@@ -46,11 +48,6 @@ namespace Draughts.Core
             {
                 IsCrowned = true;
             }
-        }
-
-        internal IEnumerable<Move> GetMoves()
-        {
-            return new MoveMap(_board, _row, _column).Moves;
         }
 
         public Piece(PieceColour colour, Board board, int row, int column, Player player)

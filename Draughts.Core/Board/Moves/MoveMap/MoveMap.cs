@@ -14,7 +14,7 @@ namespace Draughts.Core
 
         public IEnumerable<Move> Moves { get; private set; }
 
-        private void Evaluate()
+        private void Generate()
         {
             // depending on which player we are evaluating moves for, we need to either move up or down the board
             int rowStep = _root.Square.Occupier.Colour == PieceColour.Black ? 1 : -1;
@@ -52,7 +52,8 @@ namespace Draughts.Core
                 moves.Add(move);
             }
 
-            Moves = moves;
+            // exclude any moves that don't take pieces, if at least one does - we *must* take a piece if it's possible
+            Moves = moves.Any(m => m.PiecesTaken > 0) ? moves.Where(m => m.PiecesTaken > 0) : moves; 
         }
 
         private void FindEdges(MoveMapNode node, IList<MoveMapNode> output)
@@ -92,18 +93,13 @@ namespace Draughts.Core
             }
         }
 
-        public MoveMap(Board board, int row, int column)
+        public MoveMap(Piece piece)
         {
-            Square start = board[row, column];
-            if (start.IsEmpty)
-            {
-                throw new ArgumentException("Starting square must be occupied.");
-            }
-
-            _root = new MoveMapNode(null, start);
-            _board = board;
+            Square start = piece.Square;
+            _board = piece.Board;
             _colour = start.Occupier.Colour;
-            Evaluate();
+            _root = new MoveMapNode(null, start);
+            Generate();
         }
     }
 }

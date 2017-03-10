@@ -58,7 +58,7 @@ namespace Draughts.Core
             List<Move> validMoves = new List<Move>();
             foreach (Piece piece in Squares.Where(s => s.IsOccupied && s.Occupier.Owner == player).Select(s => s.Occupier))
             {
-                validMoves.AddRange(piece.GetMoves());
+                validMoves.AddRange(piece.ValidMoves);
             }
 
             return validMoves;

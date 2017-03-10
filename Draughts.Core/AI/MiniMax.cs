@@ -23,24 +23,25 @@ namespace Draughts.Core
 
             Move bestMove = playerResult.BestMove;
 
-            // if best move takes no pieces but valid moves do take pieces, we have to pick one (any one) that takes pieces
-            if (bestMove != null && bestMove.PiecesTaken == 0 && validMoves.Any(m => m.PiecesTaken > 0))
-                return validMoves.Where(m => m.PiecesTaken > 0).RandomFirstOrDefault();
-
             // if no moves take any pieces but there are crowned pieces in the lower half of the opposite board, filter only the
             // backwards moves to encourage them to move back into the middle
             // a sufficient MiniMax depth would reveal this strategy but would take too long :-(
             if (bestMove != null && bestMove.PiecesTaken == 0)
             {
                 IEnumerable<Move> crownedMoves = validMoves.Where(m => m.PieceIsCrowned &&
-                ((_player.Colour == PieceColour.Black && m.Start.Row > 3 && m.End.Row < m.Start.Row) || (_player.Colour == PieceColour.White && m.Start.Row < 4 && m.End.Row > m.Start.Row)));
+                    ((_player.Colour == PieceColour.Black && m.Start.Row > 3 && m.End.Row < m.Start.Row) || (_player.Colour == PieceColour.White && m.Start.Row < 4 && m.End.Row > m.Start.Row))
+                    );
                 if (crownedMoves.Count() > 0)
+                {
                     return crownedMoves.RandomFirstOrDefault();
+                }
             }
 
             // sometimes there is no best move within n moves ahead (all moves equally good / bad), so just use a random choice of the valid moves available
             if (bestMove == null)
+            {
                 return validMoves.RandomFirstOrDefault();
+            }
 
             // otherwise, return the recommended best move
             return bestMove;
@@ -55,11 +56,6 @@ namespace Draughts.Core
             }
 
             IEnumerable<Move> validMoves = board.ValidMovesFor(player);
-            if (!playerResult.BestMovePerGeneration.ContainsKey(playerGeneration))
-            {
-                playerResult.BestMovePerGeneration.Add(playerGeneration, null);
-            }
-
             foreach (Move move in validMoves.Randomize()) // randomize the move order to avoid first-place bias for sets of equally good moves
             {
                 Board newBoard = board.Clone();
@@ -73,7 +69,7 @@ namespace Draughts.Core
                     // only go any further down this tree branch if there's an advantage to me compared to other branches
                     playerResult.PlayerPiecesRemaining = playerPieces;
                     playerResult.OpponentPiecesRemaining = opponentPieces;
-                    playerResult.BestMovePerGeneration[playerGeneration] = move;
+                    playerResult.RegisterBestMove(move, playerGeneration);
 
                     // now play the opponent's move set for this generation, and so on down the tree until maxGenerations is reached or tree branch is pruned
                     GenerateMiniMax(newBoard, player.Opponent, opponentGeneration, playerGeneration, maxGenerations, opponentResult, playerResult);
